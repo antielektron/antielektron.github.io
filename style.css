@@ -87,6 +87,7 @@ body {
 .main-container {
     text-align: center;
     white-space: nowrap;
+    padding-top: 1vw;
 }
 
 .grid-container {
@@ -97,7 +98,7 @@ body {
     height: calc(var(--grid-height) * var(--tile-size));
     background: rgba(0, 0, 0, var(--opacity));
     display: inline-block;
-    transition-duration: 0.3s;
+    transition-duration: 1s;
 }
 
 .sidebar-container {
