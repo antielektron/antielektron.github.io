@@ -15,7 +15,7 @@ class Tile
 
         this.locked = false;
 
-        this.div.style.transform = "translate( " + (x * w) + "px, " + (y*h) + "px )";
+        this.div.style.transform = "translate( " + (x * w) + "vw, " + (y*h) + "vw )";
         this.reset();
         this.bind();
 

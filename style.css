@@ -9,8 +9,8 @@ body {
 :root{
     --grid-width: 6;
     --grid-height: 6;
-    --tile-size: 100px;
-    --button-margin: 5px;
+    --tile-size: 6vw;
+    --button-margin: 0.5vw;
     --opacity: 0.164;
 }
 
@@ -37,8 +37,8 @@ body {
     transition-duration: 0.3s;
     background: rgba(0, 0, 0, var(--opacity));
     color: rgb(255, 255, 255);
-    font-size: 30pt;
-    width: 256px;
+    font-size: 3vw;
+    width: 20vw;
 }
 
 .control-button:hover {
@@ -59,8 +59,8 @@ body {
     flex-direction: column;
     background: none;
     color: rgb(255, 255, 255);
-    font-size: 30pt;
-    width: 256px;
+    font-size: 3vw;
+    width: 20vw;
 }
 
 .status-button {
@@ -73,8 +73,8 @@ body {
     flex-direction: column;
     background: none;
     color: rgb(128, 128, 128);
-    font-size: 20pt;
-    width: 256px;
+    font-size: 2vw;
+    width: 20vw;
 }
 
 .grid-tile {
