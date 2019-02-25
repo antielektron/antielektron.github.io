@@ -1,0 +1,131 @@
+canvas { background: #eee; width: 100%; height: 100%; }
+body { 
+    margin: 0;
+    background: rgb(49, 51, 54);
+    padding: 100;
+    outline: 0;
+}
+
+:root{
+    --grid-width: 6;
+    --grid-height: 6;
+    --tile-size: 100px;
+    --button-margin: 5px;
+    --opacity: 0.164;
+}
+
+.grid-button {
+    border-radius: var(--button-margin);
+    margin: var(--button-margin);
+    width: calc(var(--tile-size) - (var(--button-margin) * 2));
+    height: calc(var(--tile-size) - (var(--button-margin) * 2));
+    display: inline-block;
+    outline: 0;
+    transition-duration: 0.3s;
+}
+
+.grid-button:focus {
+    outline: 0!important;
+}
+
+.control-button {
+    border-radius: 10px;
+    margin: 10px;
+    border: none;
+    display: list-item;
+    outline: 0;
+    transition-duration: 0.3s;
+    background: rgba(0, 0, 0, var(--opacity));
+    color: rgb(255, 255, 255);
+    font-size: 30pt;
+    width: 256px;
+}
+
+.control-button:hover {
+    background: rgba(255, 255, 255, var(--opacity));
+}
+
+.control-button:active {
+    background: rgba(255, 255, 255, calc(var(--opacity) * 2));
+}
+
+.info-button {
+    border-radius: 10px;
+    margin: 10px;
+    border: none;
+    outline: 0;
+    transition-duration: 0.3s;
+    display: flex;
+    flex-direction: column;
+    background: none;
+    color: rgb(255, 255, 255);
+    font-size: 30pt;
+    width: 256px;
+}
+
+.status-button {
+    border-radius: 10px;
+    margin: 10px;
+    border: none;
+    outline: 0;
+    transition-duration: 0.3s;
+    display: flex;
+    flex-direction: column;
+    background: none;
+    color: rgb(128, 128, 128);
+    font-size: 20pt;
+    width: 256px;
+}
+
+.grid-tile {
+    position: absolute;
+    width: var(--tile-size);
+    height: var(--tile-size); 
+    float: center;
+    background: none;
+}
+
+.main-container {
+    text-align: center;
+}
+
+.grid-container {
+    border-radius: 10px;
+    padding: 10px;
+    margin: auto;
+    width: calc(var(--grid-width) * var(--tile-size));
+    height: calc(var(--grid-height) * var(--tile-size));
+    background: rgba(0, 0, 0, var(--opacity));
+    display: inline-block;
+    transition-duration: 0.3s;
+}
+
+.sidebar-container {
+    border-radius: 10px;
+    padding: 10px;
+    vertical-align: top;
+    background: rgba(0, 0, 0, var(--opacity));
+    display: inline-flex;
+    justify-content: space-between;
+    flex-direction:column;
+    min-height: calc(var(--grid-height) * var(--tile-size));
+    position: relative;
+    transition-duration: 1s;
+}
+
+.control-container {
+    border-radius: 10px;
+    padding: 10px;
+    top: 0;
+    background: none;
+}
+
+.info-container {
+    border-radius: 10px;
+    padding: 10px;
+    bottom: 0;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    background: none;
+}
