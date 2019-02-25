@@ -11,6 +11,7 @@ body {
     --tile-size: 6vw;
     --button-margin: 0.5vw;
     --opacity: 0.164;
+
 }
 
 .grid-button {
@@ -87,7 +88,7 @@ body {
 .main-container {
     text-align: center;
     white-space: nowrap;
-    padding-top: 1vw;
+    padding-top: calc(50vh - 0.5 * (var(--grid-height) * var(--tile-size)) - 1vw);
 }
 
 .grid-container {
