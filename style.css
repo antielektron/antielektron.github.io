@@ -22,7 +22,7 @@ body {
         --button-margin: 0.5vw;
         --tile-size: calc((100vw / var(--grid-width)) - 2 * var(--button-margin));
         --border-radius: 1vw;
-        --sidebar-width: 45vw;
+        --sidebar-width: 40vw;
     }
 
 }
