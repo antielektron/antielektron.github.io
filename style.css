@@ -17,6 +17,7 @@ body {
     --opacity: 0.2;
     --border-radius: 1vh;
     --sidebar-width: 25vh;
+    --sidebar-height: none; /* unused if not in portrait mode */
 }
 
 /* override settings on portrait mode: */
@@ -27,6 +28,7 @@ body {
         --tile-size: calc((100vw / var(--grid-width)) - 2 * var(--button-margin));
         --border-radius: 1vw;
         --sidebar-width: 40vw;
+        --sidebar-height: 15vw;
     }
 
 }
@@ -113,7 +115,7 @@ body {
 
     .main-container {
         white-space: normal;
-        padding-top: 10px;
+        padding-top: calc(50vh - 0.5 * (var(--grid-height) * var(--tile-size) + var(--sidebar-height)) - 2 * var(--border-radius));
     }
 
 }
@@ -149,7 +151,7 @@ body {
         display: inline-flex;
         justify-content: space-between;
         flex-direction:row;
-        min-height: 0;
+        min-height: var(--sidebar-height);
         min-width: calc(var(--grid-width) * var(--tile-size));
     }
 
