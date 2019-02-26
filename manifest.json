@@ -1,7 +1,7 @@
 {
     "name": "Patterns",
     "short_name": "Patterns",
-    "display": "standalone",
+    "display": "fullscreen",
     "start_url": "/",
     "theme_color": "#422B42",
     "background_color": "#272227",
