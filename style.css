@@ -1,8 +1,12 @@
+html, body {
+    overflow-x: hidden;
+}
 
 body { 
     margin: 0;
     background: rgb(39, 34, 39);
     outline: 0;
+    position: relative;
 }
 
 :root{
