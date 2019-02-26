@@ -15,10 +15,18 @@ class Tile
 
         this.locked = false;
 
-        this.div.style.transform = "translate( " + (x * w) + "vw, " + (y*h) + "vw )";
+        this.div.style.transform = "translate( calc( " + x + "*" + w + "), calc(" + y + "*" + h + "))";
+
         this.reset();
         this.bind();
 
+    }
+
+    update_css_transform(w,h)
+    {
+        this.w = w;
+        this.h = h;
+        this.div.style.transform = "translate( calc( " + this.x + "*" + this.w + "), calc(" + this.y + "*" + this.h + "))";
     }
 
     register_click_callback(func)

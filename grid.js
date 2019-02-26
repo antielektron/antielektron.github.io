@@ -94,4 +94,19 @@ class Grid
             }
         }
     }
+
+    on_screen_orientation_change(tile_w,tile_h)
+    {
+        this.tile_width = tile_w;
+        this.tile_h = tile_h;
+
+        var x,y;
+        for (y = 0; y < this.height; y++)
+        {
+            for (x = 0; x < this.width; x++)
+            {
+                this.cells[y][x].update_css_transform(tile_w, tile_h);
+            }
+        }
+    }
 }

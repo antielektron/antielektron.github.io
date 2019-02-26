@@ -8,9 +8,22 @@ body {
 :root{
     --grid-width: 6;
     --grid-height: 6;
-    --tile-size: 6vw;
-    --button-margin: 0.5vw;
+    --button-margin: 0.5vh;
+    --tile-size: calc((100vh / var(--grid-height)) - 2 * var(--button-margin));
     --opacity: 0.164;
+    --border-radius: 1vh;
+    --sidebar-width: 25vh;
+}
+
+/* override settings on portrait mode: */
+@media (orientation: portrait) {
+
+    :root{
+        --button-margin: 0.5vw;
+        --tile-size: calc((100vw / var(--grid-width)) - 2 * var(--button-margin));
+        --border-radius: 1vw;
+        --sidebar-width: 45vw;
+    }
 
 }
 
@@ -29,16 +42,16 @@ body {
 }
 
 .control-button {
-    border-radius: 1vw;
-    margin: 1vw;
+    border-radius: var(--border-radius);
+    margin: var(--border-radius);
     border: none;
     display: list-item;
     outline: 0;
     transition-duration: 0.3s;
     background: rgba(0, 0, 0, var(--opacity));
     color: rgb(255, 255, 255);
-    font-size: 3vw;
-    width: 15vw;
+    font-size: calc(5 * var(--border-radius));
+    width: var(--sidebar-width);
 }
 
 .control-button:hover {
@@ -50,8 +63,8 @@ body {
 }
 
 .info-button {
-    border-radius: 1vw;
-    margin: 1vw;
+    border-radius: var(--border-radius);
+    margin: var(--border-radius);
     border: none;
     outline: 0;
     transition-duration: 0.3s;
@@ -59,13 +72,13 @@ body {
     flex-direction: column;
     background: none;
     color: rgb(255, 255, 255);
-    font-size: 3vw;
-    width: 15vw;
+    font-size: calc(5 * var(--border-radius));
+    width: var(--sidebar-width);
 }
 
 .status-button {
-    border-radius: 1vw;
-    margin: 1vw;
+    border-radius: var(--border-radius);
+    margin: var(--border-radius);
     border: none;
     outline: 0;
     transition-duration: 0.3s;
@@ -73,8 +86,8 @@ body {
     flex-direction: column;
     background: none;
     color: rgb(128, 128, 128);
-    font-size: 2vw;
-    width: 15vw;
+    font-size: calc(2 * var(--border-radius));
+    width: var(--sidebar-width);
 }
 
 .grid-tile {
@@ -88,12 +101,22 @@ body {
 .main-container {
     text-align: center;
     white-space: nowrap;
-    padding-top: calc(50vh - 0.5 * (var(--grid-height) * var(--tile-size)) - 1vw);
+    padding-top: calc(50vh - 0.5 * (var(--grid-height) * var(--tile-size)) - var(--border-radius));
+}
+
+/* override settings on portrait mode: */
+@media (orientation: portrait) {
+
+    .main-container {
+        white-space: normal;
+        padding-top: 10px;
+    }
+
 }
 
 .grid-container {
-    border-radius: 1vw;
-    padding: 1vw;
+    border-radius: var(--border-radius);
+    padding: var(--border-radius);
     margin: auto;
     width: calc(var(--grid-width) * var(--tile-size));
     height: calc(var(--grid-height) * var(--tile-size));
@@ -103,8 +126,8 @@ body {
 }
 
 .sidebar-container {
-    border-radius: 1vw;
-    padding: 1vw;
+    border-radius: var(--border-radius);
+    padding: var(--border-radius);
     vertical-align: top;
     background: rgba(0, 0, 0, var(--opacity));
     display: inline-flex;
@@ -115,16 +138,29 @@ body {
     transition-duration: 1s;
 }
 
+/* override settings on portrait mode: */
+@media (orientation: portrait) {
+
+    .sidebar-container {
+        display: inline-flex;
+        justify-content: space-between;
+        flex-direction:row;
+        min-height: 0;
+        min-width: calc(var(--grid-width) * var(--tile-size));
+    }
+
+}
+
 .control-container {
-    border-radius: 1vw;
-    padding: 1vw;
+    border-radius: var(--border-radius);
+    padding: var(--border-radius);
     top: 0;
     background: none;
 }
 
 .info-container {
-    border-radius: 1vw;
-    padding: 1vw;
+    border-radius: var(--border-radius);
+    padding: var(--border-radius);
     bottom: 0;
     display: inline-block;
     vertical-align: middle;
