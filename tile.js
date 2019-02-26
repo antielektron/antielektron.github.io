@@ -44,7 +44,6 @@ class Tile
         this.elem.addEventListener("mouseenter", c => this.on_mouseenter(c));
         this.elem.addEventListener("mouseleave", c => this.on_mouseleave(c));
         this.elem.addEventListener("mousedown", c => this.on_click(c));
-        this.elem.addEventListener("touchstart", c => this.on_click(c));
     }
 
     reset()
