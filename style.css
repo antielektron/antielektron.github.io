@@ -115,7 +115,7 @@ body {
 
     .main-container {
         white-space: normal;
-        padding-top: calc(50vh - 0.5 * (var(--grid-height) * var(--tile-size) + var(--sidebar-height)) - 2 * var(--border-radius));
+        padding-top: calc(50vh - 0.5 * (var(--grid-height) * var(--tile-size) + 2 * var(--sidebar-height)) - 2 * var(--border-radius));
     }
 
 }
