@@ -34,6 +34,11 @@ class Tile
         this.click_callback = func;
     }
 
+    register_unlock_request_callback(func)
+    {
+        this.unlock_request_callback = func;
+    }
+
     bind()
     {
         this.elem.addEventListener("mouseenter", c => this.on_mouseenter(c));
@@ -93,15 +98,21 @@ class Tile
 
     on_click()
     {
-        if (!this.locked)
+        if  (this.locked)
         {
-            var active_before = this.is_activated;
-            this.activate();
-            if (!active_before)
+            if (!this.unlock_request_callback(this.x, this.y))
             {
-                this.click_callback(this.x, this.y);
+                return;
             }
         }
+
+        var active_before = this.is_activated;
+        this.activate();
+        if (!active_before)
+        {
+            this.click_callback(this.x, this.y);
+        }
+        
     }
 
 }

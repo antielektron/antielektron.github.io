@@ -8,8 +8,11 @@ class GameManager
         this.blocked = false;
         this.default_opacity = default_opacity;
         this.n_selected = 0;
+        this.timeout_id;
+        this.in_show_mode = false;
 
         this.grid.register_click_callback((i,j) => this.click_listener(i,j));
+        this.grid.register_unlock_request_callback((i,j) => this.unlock_request_listener(i,j));
     }
 
     register_level_callback(func)
@@ -46,6 +49,17 @@ class GameManager
         {
             this.on_game_over();
         }
+    }
+
+    unlock_request_listener(x,y)
+    {
+        if (this.level > 0 && this.in_show_mode)
+        {
+            clearTimeout(this.timeout_id);
+            this.end_show_sequence();
+            return true;
+        }
+        return false;
     }
 
     restart()
@@ -91,7 +105,8 @@ class GameManager
             this.grid.cells[y][x].activate();
         }
         var time = this.level * 300 + 2000;
-        setTimeout(c => this.end_show_sequence(c), time);
+        this.in_show_mode = true;
+        this.timeout_id = setTimeout(c => this.end_show_sequence(c), time);
     }
 
     end_show_sequence()
@@ -100,6 +115,7 @@ class GameManager
         this.sidebar_div.style.backgroundColor = "rgba(0,0,0," + this.default_opacity + ")";
         this.grid.deactivate_all();
         this.unblock();
+        this.in_show_mode = false;
     }
 
     on_level_up()

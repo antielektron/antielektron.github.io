@@ -32,6 +32,7 @@ class Grid
                 var c =  "rgb(" + Math.round(255 * x / this.width) + ", " + Math.round(255 * y / this.height) + ", " + Math.round(255 * ( 1.0 - x / this.width))+")";
                 row.push(new Tile(x,y,this.tile_width,this.tile_height,button,c,div_button));
                 row[x].register_click_callback((i,j) => this.click_listener(i,j));
+                row[x].register_unlock_request_callback((i,j) => this.unlock_request_listener(i,j));
             }
             this.cells.push(row);
         }
@@ -66,9 +67,19 @@ class Grid
         this.click_callback = func;
     }
 
+    register_unlock_request_callback(func)
+    {
+        this.unlock_request_callback = func;
+    }
+
     click_listener(x,y)
     {
         this.click_callback(x,y);
+    }
+
+    unlock_request_listener(x,y)
+    {
+        return this.unlock_request_callback(x,y);
     }
 
     block()
