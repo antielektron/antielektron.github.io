@@ -92,7 +92,7 @@ body {
     flex-direction: column;
     background: none;
     color: rgb(128, 128, 128);
-    font-size: calc(2 * var(--border-radius));
+    font-size: calc(3 * var(--border-radius));
     width: var(--sidebar-width);
 }
 

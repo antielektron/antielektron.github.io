@@ -24,7 +24,7 @@ class GameManager
     register_statustext_callback(func)
     {
         this.status_callback = func;
-        func("click 'start' to begin a new game");
+        func("Click 'start' for a new game.");
     }
 
     click_listener(x,y)
@@ -93,7 +93,7 @@ class GameManager
 
     show_sequence()
     {
-        this.status_callback("memorize new sequence");
+        this.status_callback("Memorize new pattern...");
         this.grid.deactivate_all();
         var i;
         for (i=0; i < this.active_cells.length; i++)
@@ -111,7 +111,7 @@ class GameManager
 
     end_show_sequence()
     {
-        this.status_callback("it's your turn, reproduce the sequence!");
+        this.status_callback("Reproduce the pattern!");
         this.sidebar_div.style.backgroundColor = "rgba(0,0,0," + this.default_opacity + ")";
         this.grid.deactivate_all();
         this.unblock();
@@ -148,7 +148,7 @@ class GameManager
             this.grid.cells[y][x].activate();
         }
 
-        this.status_callback("Game Over. Won rounds: " + (this.level - 1));
+        this.status_callback("Game over. Won rounds: " + (this.level - 1));
         this.sidebar_div.style.backgroundColor = "rgba(255,0,0," + this.default_opacity + ")";
         this.level = 0;
         this.n_selected = 0;
@@ -156,7 +156,7 @@ class GameManager
 
     on_win()
     {
-        this.status_callback("Congratulation, You Won");
+        this.status_callback("Congratulation, you won");
         this.sidebar_div.style.backgroundColor = "rgba(0,255,0," + this.default_opacity + ")";
         this.level = 0;
         this.n_selected = 0;
