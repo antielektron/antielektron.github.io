@@ -11,7 +11,6 @@ self.addEventListener('install', function (e) {
         '/ttt/index.html',
         '/ttt/manifest.json',
         '/ttt/icon.png',
-        '/ttt/LICENSE',
         '/ttt/main.js',
         '/ttt/grid.js',
         '/ttt/local_match_manager.js',
@@ -22,7 +21,6 @@ self.addEventListener('install', function (e) {
         '/ttt/settings.js',
         '/ttt/subgrid.js',
         '/ttt/tile.js',
-        '/ttt/README.md',
         '/ttt/site.js',
         '/ttt/style.css',
       ]);
