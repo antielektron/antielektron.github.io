@@ -258,7 +258,7 @@ class WebsocketConnection
                     this.openmatches[id] = new OnlineMatchManager(this.grid, this.info_func, this.matches_container, this.control_container, this.end_button, this, id, match_state, this.player.get_name());
                     if (match_state.last_move == null)
                     {
-                        this.notify("new Game against " + this.openmatches[id].online_opponent.get_name());
+                        this.notify("new Game against " + encodeHTML(this.openmatches[id].online_opponent.get_name()));
                     }
                     this.matches_container.blink(theme_color_highlight);
                 }
@@ -304,7 +304,7 @@ class WebsocketConnection
         }
         else
         {
-            this.err_func("could not send request: " + data.msg);
+            this.err_func("could not send request: " + encodeHTML(data.msg));
         }
     }
 
@@ -356,7 +356,7 @@ class WebsocketConnection
                 display_name = display_name.substr(0,8) + "…";
             } 
 
-            var tmp = this.search_container.create_double_button("" + display_name + "<sup><span style=\"font-size: 0.5em\">" + this.elos[i] + "</span></sup>", "-");
+            var tmp = this.search_container.create_double_button("" + encodeHTML(display_name) + "<sup><span style=\"font-size: 0.5em\">" + encodeHTML(""+this.elos[i]) + "</span></sup>", "-");
 
             tmp[1].name = this.friends[i];
             tmp[2].name = this.friends[i];
@@ -379,7 +379,7 @@ class WebsocketConnection
     on_elo_update(data)
     {
         console.log("received elo update: " + data.elo);
-        this.logout_container.update_head("logged in as: " + connection.player.get_name() + "<br>Score: " + data.elo + "<br>Rank: " + data.rank);
+        this.logout_container.update_head("logged in as: " + encodeHTML(connection.player.get_name()) + "<br>Score: " + encodeHTML("" + data.elo) + "<br>Rank: " + encodeHTML(""+data.rank));
         this.top_names = data.top_names;
         this.top_elos = data.top_elos;
         this.logout_container.blink(theme_color_highlight);

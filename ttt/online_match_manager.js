@@ -64,7 +64,7 @@ class OnlineMatchManager
 
         this.game_server_connection.send_move(sub_x, sub_y, x, y, this.match_id);
 
-        this.info_func("waiting for " + this.online_opponent.get_name() + "'s move", false);
+        this.info_func("waiting for " + encodeHTML(this.online_opponent.get_name()) + "'s move", false);
     }
 
     on_user_close()
@@ -113,7 +113,7 @@ class OnlineMatchManager
 
         if (this.match_state.active_player == this.local_player.get_name())
         {
-            this.game_server_connection.notify("your turn against " + this.online_opponent.get_name());
+            this.game_server_connection.notify("your turn against " + encodeHTML(this.online_opponent.get_name()));
         }
     }
 
@@ -213,9 +213,6 @@ class OnlineMatchManager
 
         var player_a = this.match_state.player_a;
         var player_b = this.match_state.player_b;
-
-        console.log(game_over);
-        console.log(current_player);
 
         var FIELD_EMPTY = 0
         var FIELD_USER = player_a == this.player_name ? 1 : 2;
@@ -318,13 +315,13 @@ class OnlineMatchManager
         }
         else
         {
-            this.info_func("waiting for " + this.online_opponent.get_name() + "'s move", false);
+            this.info_func("waiting for " + encodeHTML(this.online_opponent.get_name()) + "'s move", false);
             this.control_container.blink(theme_color_highlight);
         }
 
         control_head += "" + current_player_name + "'s move";
 
-        this.control_container.update_head(control_head);
+        this.control_container.update_head(encodeHTML(control_head));
 
         
 

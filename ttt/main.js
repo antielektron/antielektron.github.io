@@ -79,7 +79,6 @@ logged_in = false;
 var connection = null;
 var session_id = null;
 
-
 // cookies:
 function get_cookie(cname) {
     var name = cname + "=";
@@ -113,16 +112,16 @@ function check_cookie(cname) {
 
 status_message = function(text, blink = true)
 {
-    l_status.innerHTML = text;
+    l_status.innerHTML = encodeHTML(text);
     if (blink)
     {
-        status_container.blink("rgba(126,87,194, 0.5)");
+        status_container.blink(theme_color_highlight);
     }
 }
 
 status_error = function(text, blink=true)
 {
-    l_status.innerHTML = text;
+    l_status.innerHTML = encodeHTML(text);
     if (blink)
     {
         status_container.blink("rgba(128,0,0,0.5");
@@ -131,7 +130,8 @@ status_error = function(text, blink=true)
 
 
 
-status_message("select gamemode. click <br> <a href=https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe#Rules>[here]</a> for the rules!");
+l_status.innerHTML = "select gamemode. click <br> <a href=https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe#Rules>[here]</a> for the rules!";
+status_container.blink(theme_color_highlight);
 
 
 // global funcs:
@@ -213,7 +213,7 @@ login_callback = function()
         
     }
     end_local_game();
-    logout_container.update_head("logged in as: " + connection.player.get_name());
+    logout_container.update_head("logged in as: " + encodeHTML(connection.player.get_name()));
     //logout_container.blink("rgba(128,128,128,0.5)");
 
     set_cookie("sessionid", connection.session_id, 30);
@@ -314,7 +314,7 @@ show_highscores = function()
                 {
                     name=name.substring(0,10) + "…";
                 }
-                new_text += "\#" + (i+1) + ": " + name + " [" + connection.top_elos[i] + "]<br>";
+                new_text += "<nobr>\#" + (i+1) + ": " + encodeHTML("" + connection.top_elos[i]) + " - " + encodeHTML(name) + "</nobr><br>";
             }
 
             l_highscores.innerHTML = new_text;
