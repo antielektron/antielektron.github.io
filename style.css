@@ -17,6 +17,21 @@ small {
     font-size: x-small;
 }
 
+a { 
+    white-space: nowrap;
+    display: inline;
+    clear: none;
+}
+
+a:link {
+    color: white;
+}
+
+/* visited link */
+a:visited {
+    color: white;
+}
+
 .outer {
     display: table;
     top: 0;
@@ -63,7 +78,7 @@ small {
 
 .text-label {
     color: rgba(224, 217, 235, 0.8);
-    font-size: 3vh;
+    font-size: 1.5vh;
     margin-left: 0;
     margin-right: 0;
     width: 100%;
