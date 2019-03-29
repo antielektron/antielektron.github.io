@@ -2,7 +2,7 @@
     "name": "Patterns",
     "short_name": "Patterns",
     "display": "standalone",
-    "start_url": "/",
+    "start_url": "/patterns/",
     "theme_color": "#422B42",
     "background_color": "#272227",
     "icons": [

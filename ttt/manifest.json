@@ -1,0 +1,16 @@
+{
+    "name": "Ultimate TicTacToe",
+    "short_name": "Ultimate TicTacToe",
+    "display": "standalone",
+    "start_url": "/ttt/",
+    "scope": "/ttt/",
+    "theme_color": "#7e57c2",
+    "background_color": "#31364A",
+    "icons": [
+      {
+        "src": "icon.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      }
+    ]
+}

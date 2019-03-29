@@ -1,0 +1,176 @@
+html, body {
+    overflow-x: hidden;
+}
+
+body { 
+    margin: 0;
+    background: rgb(39, 34, 39);
+    outline: 0;
+    position: relative;
+}
+
+:root{
+    --grid-width: 6;
+    --grid-height: 6;
+    --button-margin: 0.5vh;
+    --tile-size: calc((100vh / var(--grid-height)) - 2 * var(--button-margin));
+    --opacity: 0.2;
+    --border-radius: 1vh;
+    --sidebar-width: 25vh;
+    --sidebar-height: none; /* unused if not in portrait mode */
+}
+
+/* override settings on portrait mode: */
+@media (orientation: portrait) {
+
+    :root{
+        --button-margin: 0.5vw;
+        --tile-size: calc((100vw / var(--grid-width)) - 2 * var(--button-margin));
+        --border-radius: 1vw;
+        --sidebar-width: 40vw;
+        --sidebar-height: 15vw;
+    }
+
+}
+
+.grid-button {
+    border-radius: var(--button-margin);
+    margin: var(--button-margin);
+    width: calc(var(--tile-size) - (var(--button-margin) * 2));
+    height: calc(var(--tile-size) - (var(--button-margin) * 2));
+    display: inline-block;
+    outline: 0;
+    transition-duration: 0.1s;
+}
+
+.grid-button:focus {
+    outline: 0!important;
+}
+
+.control-button {
+    border-radius: var(--border-radius);
+    margin: var(--border-radius);
+    border: none;
+    display: list-item;
+    outline: 0;
+    transition-duration: 0.3s;
+    background: rgba(0, 0, 0, var(--opacity));
+    color: rgb(255, 255, 255);
+    font-size: calc(5 * var(--border-radius));
+    width: var(--sidebar-width);
+}
+
+.control-button:hover {
+    background: rgba(255, 255, 255, var(--opacity));
+}
+
+.control-button:active {
+    background: rgba(255, 255, 255, calc(var(--opacity) * 2));
+}
+
+.info-button {
+    border-radius: var(--border-radius);
+    margin: var(--border-radius);
+    border: none;
+    outline: 0;
+    transition-duration: 0.3s;
+    display: flex;
+    flex-direction: column;
+    background: none;
+    color: rgb(255, 255, 255);
+    font-size: calc(5 * var(--border-radius));
+    width: var(--sidebar-width);
+}
+
+.status-button {
+    border-radius: var(--border-radius);
+    margin: var(--border-radius);
+    border: none;
+    outline: 0;
+    transition-duration: 0.3s;
+    display: flex;
+    flex-direction: column;
+    background: none;
+    color: rgb(128, 128, 128);
+    font-size: calc(3 * var(--border-radius));
+    width: var(--sidebar-width);
+}
+
+.grid-tile {
+    position: absolute;
+    width: var(--tile-size);
+    height: var(--tile-size); 
+    float: center;
+    background: none;
+}
+
+.main-container {
+    text-align: center;
+    white-space: nowrap;
+    padding-top: calc(50vh - 0.5 * (var(--grid-height) * var(--tile-size)) - var(--border-radius));
+}
+
+/* override settings on portrait mode: */
+@media (orientation: portrait) {
+
+    .main-container {
+        white-space: normal;
+        padding-top: calc(50vh - 0.5 * (var(--grid-height) * var(--tile-size) + 2 * var(--sidebar-height)) - 2 * var(--border-radius));
+    }
+
+}
+
+.grid-container {
+    border-radius: var(--border-radius);
+    padding: var(--border-radius);
+    margin: auto;
+    width: calc(var(--grid-width) * var(--tile-size));
+    height: calc(var(--grid-height) * var(--tile-size));
+    background: rgba(0, 0, 0, var(--opacity));
+    display: inline-block;
+    transition-duration: 0.5s;
+}
+
+.sidebar-container {
+    border-radius: var(--border-radius);
+    padding: var(--border-radius);
+    vertical-align: top;
+    background: rgba(0, 0, 0, var(--opacity));
+    display: inline-flex;
+    justify-content: space-between;
+    flex-direction:column;
+    min-height: calc(var(--grid-height) * var(--tile-size));
+    position: relative;
+    transition-duration: 0.5s;
+}
+
+/* override settings on portrait mode: */
+@media (orientation: portrait) {
+
+    .sidebar-container {
+        display: inline-flex;
+        justify-content: space-between;
+        flex-direction:row;
+        min-height: var(--sidebar-height);
+        min-width: calc(var(--grid-width) * var(--tile-size));
+    }
+
+}
+
+.control-container {
+    border-radius: var(--border-radius);
+    padding: var(--border-radius);
+    top: 0;
+    background: none;
+}
+
+.info-container {
+    border-radius: var(--border-radius);
+    padding: var(--border-radius);
+    bottom: 0;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    background: none;
+    white-space: normal;
+}
