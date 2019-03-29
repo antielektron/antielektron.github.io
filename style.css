@@ -21,15 +21,16 @@ a {
     white-space: nowrap;
     display: inline;
     clear: none;
+    font-size: 1.5vh;
 }
 
 a:link {
-    color: white;
+    color: rgba(224, 217, 235, 0.8);
 }
 
 /* visited link */
 a:visited {
-    color: white;
+    color: rgba(224, 217, 235, 0.8);
 }
 
 .outer {
@@ -50,17 +51,19 @@ a:visited {
 }
 
 .ttt-div {
-    margin-left: auto;
-    margin-right: auto;
-    padding: 3%;
+    border-radius: 2vh;
+    margin: 2vh;
+    background-color: rgba(0,0,0,0.2);
+    padding: 2%;
     display: inline-block;
     width: 40vh;
 }
 
 .patterns-div {
-    margin-left: auto;
-    margin-right: auto;
-    padding: 3%;
+    border-radius: 2vh;
+    margin: 2vh;
+    background-color: rgba(0,0,0,0.2);
+    padding: 2%;
     display: inline-block;
     width: 40vh;
 }
@@ -79,10 +82,4 @@ a:visited {
 .text-label {
     color: rgba(224, 217, 235, 0.8);
     font-size: 1.5vh;
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
 }
