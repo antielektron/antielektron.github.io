@@ -539,6 +539,11 @@ class WebsocketConnection
         
         Notification.requestPermission(function(result) {
             if (result === 'granted') {
+                if (navigator.serviceWorker == undefined)
+                {
+                    var notification = new Notification(text);
+                    return;
+                }
                 navigator.serviceWorker.ready.then(function(registration) {
                 registration.showNotification(text, {
                         icon: './icon.png',
