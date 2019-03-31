@@ -261,7 +261,7 @@ class OnlineMatchManager
             }
             else
             {
-                status_message("Game over, you lost!");
+                this.info_func("Congratulation, you won!");
                 control_head += "You lost";
                 this.control_container.set_background_color(this.online_opponent.get_color_with_alpha(0.4));
             }
