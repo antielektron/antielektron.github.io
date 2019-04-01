@@ -28,7 +28,7 @@ register_container = main_menu.create_infocontainer("Login to play online");
 i_register_username = register_container.create_input("username");
 i_register_pw = register_container.create_input("password", true);
 b_register = register_container.create_button("register/login");
-//register_container.create_label("(creates new account for a new username)");
+register_container.create_label("If the username does not exists yet, a new account is created automatically");
 
 // logout TODO: rename container:
 logout_container = main_menu.create_infocontainer("Logged in as: ");
@@ -42,7 +42,7 @@ l_highscores.style.textAlign = "left"
 
 
 // fill subcontainer:
-match_slot_container = sub_menu.create_infocontainer("Running Matches<br>(click to open)");
+match_slot_container = sub_menu.create_infocontainer("Running Matches");
 
 
 // match control:

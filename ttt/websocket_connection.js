@@ -20,6 +20,8 @@ class WebsocketConnection
 
         this.end_button = end_button;
 
+        this.l_matches_container = null;
+
         this.active_match = null;
 
         this.connected = false;
@@ -90,6 +92,13 @@ class WebsocketConnection
             this.openmatches[key].remove_match();
         }
         this.openmatches = {};
+        // remove match info label if exists:
+        if (this.l_matches_container != null)
+        {
+            this.matches_container.container.removeChild(this.l_matches_container);
+            clearInner(this.l_matches_container);
+            this.l_matches_container = null;
+        }
         
         // remove complete friend list:
         var n = this.friend_name_divs.length;
@@ -123,6 +132,13 @@ class WebsocketConnection
             this.openmatches[key].remove_match();
         }
         this.openmatches = {};
+        // remove match info label if exists:
+        if (this.l_matches_container != null)
+        {
+            this.matches_container.container.removeChild(this.l_matches_container);
+            clearInner(this.l_matches_container);
+            this.l_matches_container = null;
+        }
 
         // remove complete friend list:
         var n = this.friend_name_divs.length;
@@ -228,6 +244,7 @@ class WebsocketConnection
     {
         var id = data.id
         var match_state = data.match_state;
+        var revoke_time = data.revoke_time;
 
         if (match_state == null)
         {
@@ -241,7 +258,7 @@ class WebsocketConnection
         {
             if (id in this.openmatches)
             {
-                this.openmatches[id].update_match_state(match_state)
+                this.openmatches[id].update_match_state(match_state, revoke_time)
                 if (this.active_match == id)
                 {
                     this.openmatches[id].open_match();
@@ -255,12 +272,24 @@ class WebsocketConnection
             {
                 if (!match_state.game_over)
                 {
-                    this.openmatches[id] = new OnlineMatchManager(this.grid, this.info_func, this.matches_container, this.control_container, this.end_button, this, id, match_state, this.player.get_name());
+
+                    // remove match info label if exists:
+                    if (this.l_matches_container != null)
+                    {
+                        this.matches_container.container.removeChild(this.l_matches_container);
+                        clearInner(this.l_matches_container);
+                        this.l_matches_container = null;
+                    }
+
+                    this.openmatches[id] = new OnlineMatchManager(this.grid, this.info_func, this.matches_container, this.control_container, this.end_button, this, id, match_state, revoke_time, this.player.get_name());
                     if (match_state.last_move == null)
                     {
                         this.notify("new Game against " + encodeHTML(this.openmatches[id].online_opponent.get_name()));
                     }
                     this.matches_container.blink(theme_color_highlight);
+
+                    // create new info:
+                    this.l_matches_container = this.matches_container.create_label("click on name to open,<br>click '+' to add as friend");
                 }
                 
             }
@@ -539,6 +568,12 @@ class WebsocketConnection
         
         Notification.requestPermission(function(result) {
             if (result === 'granted') {
+                if (navigator.serviceWorker == undefined)
+                {
+                    var notification = new Notification(text);
+                    return;
+                }
+                
                 navigator.serviceWorker.ready.then(function(registration) {
                 registration.showNotification(text, {
                         icon: './icon.png',

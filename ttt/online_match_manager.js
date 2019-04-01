@@ -1,6 +1,6 @@
 class OnlineMatchManager
 {
-    constructor(grid, info_func, matches_container, control_container, end_button, game_server_connection, match_id, match_state, player_name)
+    constructor(grid, info_func, matches_container, control_container, end_button, game_server_connection, match_id, match_state, revoke_time, player_name)
     {
         this.grid = grid;
 
@@ -12,7 +12,8 @@ class OnlineMatchManager
 
 
         this.match_state = match_state;
-        this.player_name = player_name
+        this.revoke_time = Date.create_from_mysql(revoke_time);
+        this.player_name = player_name;
 
         var player_a = this.match_state.player_a;
         var player_b = this.match_state.player_b;
@@ -98,9 +99,10 @@ class OnlineMatchManager
         }
     }
 
-    update_match_state(match_state)
+    update_match_state(match_state, revoke_time)
     {
         this.match_state = match_state;
+        this.revoke_time = Date.create_from_mysql(revoke_time);
         
         if (this.online_opponent.get_name() == this.match_state.active_player)
         {
@@ -261,7 +263,7 @@ class OnlineMatchManager
             }
             else
             {
-                status_mesage("Game over, you lost!");
+                this.info_func("Game Over, you lost!");
                 control_head += "You lost";
                 this.control_container.set_background_color(this.online_opponent.get_color_with_alpha(0.4));
             }
@@ -289,6 +291,10 @@ class OnlineMatchManager
         var current_player = this.player_name == current_player_name ? this.local_player : this.online_opponent;
         this.grid.player_change_listener(current_player);
 
+
+        // date difference in hours:
+        var dt = Math.floor(Math.abs(Date.now() - this.revoke_time) / 36e5);
+
         
         if (this.player_name == current_player_name)
         {
@@ -303,19 +309,19 @@ class OnlineMatchManager
                 {
                     this.grid.unblock(x,y);
                 }
-                this.info_func("It's your turn!", false);
+                this.info_func("It's your turn! (" + dt + "h left)", false);
                 this.control_container.blink(theme_color_highlight);
             }
             else
             {
-                this.info_func("It's your turn!", false);
+                this.info_func("It's your turn! (" + dt + "h left)", false);
                 this.control_container.blink(theme_color_highlight);
                 this.grid.unblock_all();
             }
         }
         else
         {
-            this.info_func("waiting for " + encodeHTML(this.online_opponent.get_name()) + "'s move", false);
+            this.info_func("waiting for " + encodeHTML(this.online_opponent.get_name()) + "'s move  (" + dt + "h left)", false);
             this.control_container.blink(theme_color_highlight);
         }
 
