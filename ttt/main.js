@@ -28,7 +28,7 @@ register_container = main_menu.create_infocontainer("Login to play online");
 i_register_username = register_container.create_input("username");
 i_register_pw = register_container.create_input("password", true);
 b_register = register_container.create_button("register/login");
-register_container.create_label("If the username does not exists yet, a new account is created automatically");
+register_container.create_label("If the username does not exist yet, a new account is created automatically");
 register_container.create_label("Note that inactive accounts will be deleted after 45 days")
 
 // logout TODO: rename container:
