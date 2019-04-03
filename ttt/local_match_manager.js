@@ -32,13 +32,14 @@ class LocalMatchManager
             this.status_label.innerHTML = "" + this.grid.get_won_player().get_name() + " has won.";
             this.control_container.update_head("" + this.grid.get_won_player().get_name() + " won");
             this.control_container.set_background_color(this.grid.get_won_player().get_color_with_alpha(0.4));
+            this.grid.block_all();
         }
         else if (this.grid.is_complete())
         {
             this.status_label.innerHTML = "Draw. Everybody looses!";
             this.control_container.update_head("Draw");
             this.control_container.set_background_color(theme_color_highlight);
-
+            this.grid.block_all();
         }
         else
         {
