@@ -26,9 +26,9 @@ b_local_game = create_game_container.create_button("Local Game");
 // register container:
 register_container = main_menu.create_infocontainer("Login to play online");
 i_register_username = register_container.create_input("username");
-i_register_pw = register_container.create_input("password", true);
-b_register = register_container.create_button("register/login");
-register_container.create_label("If the username does not exist yet, a new account is created automatically");
+i_register_pw = register_container.create_input("pw (optional)", true);
+b_register = register_container.create_button("play online");
+register_container.create_label("To play ranked matches you have to create an account. Login without an password will only create a temporary session");
 register_container.create_label("Note that inactive accounts will be deleted after 45 days")
 
 // logout TODO: rename container:

@@ -1,6 +1,6 @@
 class OnlineMatchManager
 {
-    constructor(grid, info_func, matches_container, control_container, end_button, game_server_connection, match_id, match_state, revoke_time, player_name)
+    constructor(grid, info_func, matches_container, control_container, end_button, game_server_connection, match_id, match_state, revoke_time, player_name, ranked)
     {
         this.grid = grid;
 
@@ -9,6 +9,8 @@ class OnlineMatchManager
         this.info_func = info_func;
 
         this.game_server_connection = game_server_connection;
+
+        this.ranked = ranked;
 
 
         this.match_state = match_state;
@@ -32,7 +34,7 @@ class OnlineMatchManager
         this.match_button_div = tmp[0];
         this.match_button_option = tmp[2];
 
-        if (this.game_server_connection.is_friend(this.online_opponent.get_name()))
+        if (this.game_server_connection.temporary_session || this.game_server_connection.is_friend(this.online_opponent.get_name()))
         {
             this.match_button_option.disabled = true;
         }
@@ -244,7 +246,7 @@ class OnlineMatchManager
             }
         }
 
-        var control_head = "";
+        var control_head = this.ranked ? "Ranked Match<br>" : "Unranked_Match<br>";
         this.control_container.clear_background_color();
 
         this.update_button_text();
@@ -325,9 +327,9 @@ class OnlineMatchManager
             this.control_container.blink(theme_color_highlight);
         }
 
-        control_head += "" + current_player_name + "'s move";
+        control_head += "" + encodeHTML(current_player_name) + "'s move";
 
-        this.control_container.update_head(encodeHTML(control_head));
+        this.control_container.update_head(control_head);
 
         
 

@@ -9,6 +9,8 @@ class WebsocketConnection
         this.socket = null;
         this.registered = false;
 
+        this.temporary_session = false;
+
         this.info_func = info_func;
         this.err_func = err_func;
 
@@ -41,6 +43,8 @@ class WebsocketConnection
         this.top_elos = [];
 
         this.friend_name_divs = [];
+
+
 
         matches_container.hide();
 
@@ -245,6 +249,7 @@ class WebsocketConnection
         var id = data.id
         var match_state = data.match_state;
         var revoke_time = data.revoke_time;
+        var ranked = data.ranked;
 
         if (match_state == null)
         {
@@ -281,7 +286,7 @@ class WebsocketConnection
                         this.l_matches_container = null;
                     }
 
-                    this.openmatches[id] = new OnlineMatchManager(this.grid, this.info_func, this.matches_container, this.control_container, this.end_button, this, id, match_state, revoke_time, this.player.get_name());
+                    this.openmatches[id] = new OnlineMatchManager(this.grid, this.info_func, this.matches_container, this.control_container, this.end_button, this, id, match_state, revoke_time, this.player.get_name(), ranked);
                     if (match_state.last_move == null)
                     {
                         this.notify("new Game against " + encodeHTML(this.openmatches[id].online_opponent.get_name()));
@@ -303,6 +308,7 @@ class WebsocketConnection
         {
             this.registered = true;
             this.session_id = data.id;
+            this.temporary_session = !data.registered;
             this.login_callback_func();
             this.info_func(data.msg);
             return;
@@ -408,7 +414,10 @@ class WebsocketConnection
     on_elo_update(data)
     {
         console.log("received elo update: " + data.elo);
-        this.logout_container.update_head("logged in as: " + encodeHTML(connection.player.get_name()) + "<br>Score: " + encodeHTML("" + data.elo) + "<br>Rank: " + encodeHTML(""+data.rank));
+        if (data.elo != null && data.rank != null)
+        {
+            this.logout_container.update_head("logged in as: " + encodeHTML(connection.player.get_name()) + "<br>Score: " + encodeHTML("" + data.elo) + "<br>Rank: " + encodeHTML(""+data.rank));
+        }
         this.top_names = data.top_names;
         this.top_elos = data.top_elos;
         this.logout_container.blink(theme_color_highlight);
