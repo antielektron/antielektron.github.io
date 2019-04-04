@@ -246,7 +246,7 @@ class OnlineMatchManager
             }
         }
 
-        var control_head = this.ranked ? "Ranked Match<br>" : "Unranked_Match<br>";
+        var control_head = this.ranked ? "Ranked Match<br>" : "Unranked Match<br>";
         this.control_container.clear_background_color();
 
         this.update_button_text();
