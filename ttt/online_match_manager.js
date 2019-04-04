@@ -34,7 +34,9 @@ class OnlineMatchManager
         this.match_button_div = tmp[0];
         this.match_button_option = tmp[2];
 
-        if (this.game_server_connection.temporary_session || this.game_server_connection.is_friend(this.online_opponent.get_name()))
+        // Note: unranked matches means that not both users have a full account, so they cannot be friends
+
+        if (!this.ranked || this.game_server_connection.is_friend(this.online_opponent.get_name()))
         {
             this.match_button_option.disabled = true;
         }
