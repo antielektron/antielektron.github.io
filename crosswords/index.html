@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+
+<head>
+    <!-- Polyfills only needed for Firefox and Edge. -->
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+    <!-- Works only on browsers that support Javascript modules like
+       Chrome, Safari, Firefox 60, Edge 17 -->
+
+</head>
+
+<body style="background-color: black;">
+    <info-box id="infobox"></info-box>
+    <server-connection id="server-connection" grid_id="grid" url="wss://the-cake-is-a-lie.net:8765"></server-connection>
+    <crossword-grid id="grid" infobox_id="infobox" width="10" height="10"></crossword-grid>
+    <script type="module" src="./main.js"></script>
+    
+</body>
+
+</html>
