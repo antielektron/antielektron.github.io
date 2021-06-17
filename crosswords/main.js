@@ -1,3 +1,3 @@
-import './grid.js'
-import './serverConnection.js'
+import * from './grid.js'
+import * from './serverConnection.js'
 
