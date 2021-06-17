@@ -1,5 +1,5 @@
 import { html, css, LitElement, unsafeCSS } from 'https://unpkg.com/lit-element/lit-element.js?module';
-
+import './infoBox.js'
 
 const gridType = {
     EMPTY: 0,
