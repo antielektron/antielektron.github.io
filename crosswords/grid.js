@@ -196,6 +196,7 @@ export class GridLetter extends GridBox {
 
         if (this.revealed) {
             this.value = oldVal;
+            this.crosswordGrid.focusNextCell(this.x, this.y);
             return
         }
 
@@ -696,12 +697,17 @@ export class CrosswordGrid extends LitElement {
 
         if (left_end.getGridType() === gridType.HINT) {
             var box = left_end.getHintBox();
-            hHint = `${box.hint_id}: ${box.horizontal_hint}`;
+            if (box.hasHorizontalHint()){
+                hHint = `${box.hint_id}: ${box.horizontal_hint}`;
+            }
         }
 
         if (upper_end.getGridType() === gridType.HINT) {
             var box = upper_end.getHintBox()
-            vHint = `${box.hint_id}: ${box.vertical_hint}`;
+            if (box.hasVerticalHint())
+            {
+                vHint = `${box.hint_id}: ${box.vertical_hint}`;
+            }
         }
 
         this.infobox.horizontal_hint = hHint;
