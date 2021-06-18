@@ -1,5 +1,5 @@
 import { html, css, LitElement, unsafeCSS } from 'https://unpkg.com/lit-element/lit-element.js?module';
-import { getCookie, setCookie } from '/cookie.js';
+import { getCookie, setCookie } from './cookie.js';
 
 function copyToClipboard(text) {
     var input = document.body.appendChild(document.createElement("input"));
