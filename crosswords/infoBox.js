@@ -1,5 +1,5 @@
 import { html, css, LitElement, unsafeCSS } from 'https://unpkg.com/lit-element/lit-element.js?module';
-import { getCookie, setCookie } from './cookie.js';
+import { getCookie, setCookie } from '/cookie.js';
 
 function copyToClipboard(text) {
     var input = document.body.appendChild(document.createElement("input"));
@@ -26,6 +26,7 @@ export class InfoBox extends LitElement {
             }
 
             .infobox {
+                font-size = 1em;
                 z-index: 20;
                 position: fixed;
                 display: grid;
@@ -45,13 +46,13 @@ export class InfoBox extends LitElement {
             .buttonbox {
                 grid-column: 2;
                 grid-row: 1;
-                padding: 0.5em;
+                padding: 0.3em;
             }
 
             .button {
                 background-color: black;
                 border-color: white;
-                border-width: 0.2;
+                border-width: 0.2em;
                 border-style: solid;
                 min-width: 10em;
                 min-height: 2.5em;
@@ -59,6 +60,7 @@ export class InfoBox extends LitElement {
                 outline: none;
                 margin: 0.1em 0.1em;
                 color: white;
+                font-size: 1em;
             }
 
         `;
