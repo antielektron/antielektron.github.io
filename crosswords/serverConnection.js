@@ -1,6 +1,6 @@
 import { html, css, LitElement } from 'https://unpkg.com/lit-element/lit-element.js?module';
-import { WebsocketConnection } from './websocket.js';
-import { getCookie, setCookie } from './cookie.js';
+import { WebsocketConnection } from '/websocket.js';
+import { getCookie, setCookie } from '/cookie.js';
 
 export class ServerConnection extends WebsocketConnection {
     static get styles() {
@@ -10,7 +10,8 @@ export class ServerConnection extends WebsocketConnection {
     static get properties() {
         return {
             url: { type: String },
-            grid_id: { type: String }
+            grid_id: { type: String },
+            lang: { type: String }
         }
     }
 
@@ -19,6 +20,7 @@ export class ServerConnection extends WebsocketConnection {
         this.sessionId = null;
         this.isRegistered = false;
         this.crossword_grid = null;
+
     }
 
     update(props) {
@@ -51,7 +53,8 @@ export class ServerConnection extends WebsocketConnection {
         console.log("register", this.sessionId);
         this.sendMessage({
             'type': 'register',
-            'sessionId': this.sessionId
+            'sessionId': this.sessionId,
+            'lang': this.lang
         });
     }
 

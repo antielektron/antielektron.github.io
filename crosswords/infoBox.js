@@ -79,13 +79,13 @@ export class InfoBox extends LitElement {
         this.horizontal_hint = "";
     }
 
-    onNew(){
-        setCookie("session","");
+    onNew() {
+        setCookie("session", "");
         window.location.href = location.protocol + '//' + location.host + location.pathname;
 
     }
 
-    onShare(){
+    onShare() {
         copyToClipboard(window.location.href);
     }
 

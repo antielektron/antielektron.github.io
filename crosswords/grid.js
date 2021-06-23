@@ -116,7 +116,13 @@ customElements.define('grid-box', GridBox);
 export class GridLetter extends GridBox {
     static get styles() {
         return css`
+            .letter {
+                display: grid;
+            }
+
             input[type='text'] {
+                grid-column: 1;
+                grid-row: 1;
                 width: 1.5em;
                 height: 1.5em;
                 text-align: center;
@@ -131,18 +137,47 @@ export class GridLetter extends GridBox {
             }
 
             input[type='text']:focus {
+                grid-column: 1;
+                grid-row: 1;
                 background-color: LightYellow;
                 border-color: Yellow;
 
             }
 
             input[type='text']:read-only {
+                grid-column: 1;
+                grid-row: 1;
                 background-color: LightGreen;
             }
 
             input[type='text']:selection {
+                grid-column: 1;
+                grid-row: 1;
                 background: transparent;
             }
+
+            .circle {
+                margin: auto;
+                text-align: left;
+                vertical-align: bottom;
+                bottom: 0;
+                position: relative;
+                z-index: 0;
+                pointer-events: none;
+                grid-column: 1;
+                grid-row: 1;
+                border: 0.1em solid lightGray;
+                color: black;
+                height: 80%;
+                width: 80%;
+                border-radius:50%;
+                -moz-border-radius:50%;
+                -webkit-border-radius:50%;
+                background: transparent;
+                
+            }
+
+
         `;
     }
 
@@ -159,7 +194,10 @@ export class GridLetter extends GridBox {
         super();
         this._value = '';
         this.is_focused = false;
-        this.key_delay = false;
+        this.firstKeydownOver = true;
+        this.solutionIndex = -1;
+        this.lastFocusedX = -1;
+        this.lastFocusedY = -1;
         this.updateGridElement();
     }
 
@@ -179,7 +217,9 @@ export class GridLetter extends GridBox {
 
     onInput(e) {
 
+
         if (!this.is_focused) {
+            e.handled = true;
             return;
         }
 
@@ -213,7 +253,7 @@ export class GridLetter extends GridBox {
         }
 
         if (!e.handled && this.value.length === 0) {
-            this.crosswordGrid.focusPrevCell(this.x, this.y);
+            this.crosswordGrid.focusPrevCell(this.x, this.y, this.lastFocusedX, this.lastFocusedY);
             e.handled = true;
         }
         else if (!e.handled && this.value.length === 1) {
@@ -233,7 +273,7 @@ export class GridLetter extends GridBox {
             })
         }
 
-        if (!e.handled){
+        if (!e.handled) {
 
             e.target.select();
 
@@ -242,27 +282,42 @@ export class GridLetter extends GridBox {
 
     }
 
-    onKeydown(e) {
-
-        if (!this.is_focused) {
+    onKeyup(e) {
+        if (!this.firstKeydownOver) {
+            e.handled = true;
             return;
         }
 
-        this.key_delay = false;
+        var key = e.key;
+        if (this.value.length == 0 || this.revealed) {
+            if (key === 'Backspace' || key === 'Delete') {
+                this.crosswordGrid.focusPrevCell(this.x, this.y, this.lastFocusedX, this.lastFocus);
+                e.handled = true;
+                return
+
+            }
+            else if (this.revealed) {
+                this.crosswordGrid.focusNextCell(this.x, this.y);
+                e.handled = true;
+                return
+            }
+        }
+    }
+
+    onKeydown(e) {
+
+        this.firstKeydownOver = true;
+
+        if (!this.is_focused) {
+            e.handled = true;
+            return;
+        }
+
 
         var key = e.key;
 
         console.log(key);
 
-
-        if (this.value.length == 0) {
-            if (key === 'Backspace' || key === 'Delete') {
-                this.crosswordGrid.focusPrevCell(this.x, this.y);
-                e.handled = true;
-                return
-
-            }
-        }
 
         // check arrow keys
         if (key === "ArrowLeft") {
@@ -301,14 +356,20 @@ export class GridLetter extends GridBox {
     onFocus(e) {
         e.target.select();
         this.is_focused = true;
-        this.key_delay = true;
 
         this.crosswordGrid.updateHints(this.x, this.y);
     }
 
-    focus() {
+    focus(lastX = -1, lastY = -1) {
+        if (lastX > 0 && lastY > 0) {
+            this.lastFocusedX = lastX;
+            this.lastFocusedY = lastY;
+        }
         var element = this.shadowRoot.getElementById(`${this.x}-${this.y}`);
+        this.firstKeydownOver = false;
         element.focus();
+
+
     }
 
     blur() {
@@ -323,13 +384,13 @@ export class GridLetter extends GridBox {
         if (this.grid_id != null) {
 
             this.gridElement.setGridLetter(this);
+            this.solutionIndex = this.crosswordGrid.getSolutionIndex(this.x, this.y)
         }
     }
 
     updateLetter(letter, revealed) {
         this.value = letter;
-        if (revealed)
-        {
+        if (revealed) {
             console.log("rec")
             this.shadowRoot.getElementById(`${this.x}-${this.y}`).readOnly = true;
             this.blur();
@@ -339,7 +400,25 @@ export class GridLetter extends GridBox {
 
     render() {
         this.updateGridElement();
-        return html`<input type="text" id="${this.x}-${this.y}" value="${this.value}" @input=${this.onInput} @focus=${this.onFocus} @keydown=${this.onKeydown} autocomplete="off"></input>`;
+
+        var solutionOverlay = html``;
+
+        if (this.solutionIndex >= 0) {
+            solutionOverlay = html`
+                <div class="circle">${this.solutionIndex}</div>
+            `;
+        }
+
+
+
+        return html`
+            <div class="letter">
+                <input type="text" id="${this.x}-${this.y}" value="${this.value}" @input=${this.onInput} @focus=${this.onFocus} @keydown=${this.onKeydown} @keyup=${this.onKeyup} autocomplete="off"></input>
+                ${solutionOverlay}
+            </div>
+
+        `;
+
     }
 }
 
@@ -508,7 +587,7 @@ export class CrosswordGrid extends LitElement {
             id: { type: String },
             width: { type: Number },
             height: { type: Number },
-            infobox_id: {type: String}
+            infobox_id: { type: String }
         }
     }
 
@@ -527,6 +606,18 @@ export class CrosswordGrid extends LitElement {
         this.infobox = null;
 
         this.serverConnection = null;
+
+        this.solution_locations = null;
+    }
+
+    getSolutionIndex(x, y) {
+        var i = 0;
+        for (i = 0; i < this.solution_locations.length; i++) {
+            if (this.solution_locations[i][0] == y && this.solution_locations[i][1] == x) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     createGridByJson(json_grid) {
@@ -535,6 +626,8 @@ export class CrosswordGrid extends LitElement {
         this.grid = [];
         const width = json_grid.w;
         const height = json_grid.h;
+
+        this.solution_locations = json_grid.solution
 
         var y;
         var x;
@@ -573,7 +666,7 @@ export class CrosswordGrid extends LitElement {
             if (this.grid[y][x].getGridType() === gridType.LETTER) {
                 this.grid[y][x].getGridLetter().blur();
             }
-            this.grid[y][x + 1].getGridLetter().focus();
+            this.grid[y][x + 1].getGridLetter().focus(x, y);
 
 
             return true;
@@ -601,7 +694,7 @@ export class CrosswordGrid extends LitElement {
             if (this.grid[y][x].getGridType() === gridType.LETTER) {
                 this.grid[y][x].getGridLetter().blur();
             }
-            this.grid[y + 1][x].getGridLetter().focus();
+            this.grid[y + 1][x].getGridLetter().focus(x, y);
 
             return true;
         }
@@ -642,7 +735,11 @@ export class CrosswordGrid extends LitElement {
         }
     }
 
-    focusPrevCell(x, y) {
+    focusPrevCell(x, y, lastX = -1, lastY = -1) {
+        if (lastX > 0 && lastY > 0) {
+            this.grid[lastY][lastX].getGridLetter().focus();
+            return;
+        }
         if (this.lastMoveVertical) {
             if (this.focusPrevCellVertical(x, y)) {
                 return;
@@ -675,9 +772,9 @@ export class CrosswordGrid extends LitElement {
         super.update()
     }
 
-    updateHints(x,y) {
+    updateHints(x, y) {
         var cell = this.grid[y][x];
-        if (cell.getGridType() != gridType.LETTER){
+        if (cell.getGridType() != gridType.LETTER) {
             console.error("cannot get hints for non letter cell");
         }
 
@@ -697,15 +794,14 @@ export class CrosswordGrid extends LitElement {
 
         if (left_end.getGridType() === gridType.HINT) {
             var box = left_end.getHintBox();
-            if (box.hasHorizontalHint()){
+            if (box.hasHorizontalHint()) {
                 hHint = `${box.hint_id}: ${box.horizontal_hint}`;
             }
         }
 
         if (upper_end.getGridType() === gridType.HINT) {
             var box = upper_end.getHintBox()
-            if (box.hasVerticalHint())
-            {
+            if (box.hasVerticalHint()) {
                 vHint = `${box.hint_id}: ${box.vertical_hint}`;
             }
         }
@@ -728,10 +824,10 @@ export class CrosswordGrid extends LitElement {
                 var vertical_hint = this.json_grid.grid[el.y][el.x].vertical_hint;
                 var horizontal_hint = this.json_grid.grid[el.y][el.x].horizontal_hint;
 
-                if (!vertical_hint){
+                if (!vertical_hint) {
                     vertical_hint = "";
                 }
-                if (!horizontal_hint){
+                if (!horizontal_hint) {
                     horizontal_hint = "";
                 }
 
@@ -745,19 +841,19 @@ export class CrosswordGrid extends LitElement {
         }
     }
 
-    updateLetter(x,y,letter,revealed) {
+    updateLetter(x, y, letter, revealed) {
         var cell = this.grid[y][x];
-        if (cell.getGridType() != gridType.LETTER){
+        if (cell.getGridType() != gridType.LETTER) {
             console.error("received bad message");
         }
         cell.getGridLetter().updateLetter(letter, revealed)
     }
 
-    registerServerConnection(connection){
+    registerServerConnection(connection) {
         this.serverConnection = connection
     }
 
-    sendMessage(msg){
+    sendMessage(msg) {
         if (!this.serverConnection) {
             console.error("no server connection registered")
         }
