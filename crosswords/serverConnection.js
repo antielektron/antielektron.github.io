@@ -1,6 +1,6 @@
 import { html, css, LitElement } from 'https://unpkg.com/lit-element/lit-element.js?module';
-import { WebsocketConnection } from '/websocket.js';
-import { getCookie, setCookie } from '/cookie.js';
+import { WebsocketConnection } from './websocket.js';
+import { getCookie, setCookie } from './cookie.js';
 
 export class ServerConnection extends WebsocketConnection {
     static get styles() {
