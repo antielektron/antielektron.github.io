@@ -1,6 +1,6 @@
 import { html, css, LitElement, unsafeCSS } from 'https://unpkg.com/lit-element/lit-element.js?module';
 import './infoBox.js'
-import {GridElement, GridLetter, GridBox, gridType} from './gridBoxes.js'
+import { GridElement, GridLetter, GridBox, gridType } from './gridBoxes.js'
 import './solutionBox.js'
 
 export class CrosswordGrid extends LitElement {
@@ -88,10 +88,11 @@ export class CrosswordGrid extends LitElement {
 
         this.solution_locations = json_grid.solution
 
-        if (this.solutionBox)
+        if (this.solutionBox){
             this.solutionBox.length = this.solution_locations.length;
             this.solutionBox.requestUpdate();
             console.log("update box");
+        }
 
         var y;
         var x;
@@ -126,7 +127,7 @@ export class CrosswordGrid extends LitElement {
 
         this.requestUpdate();
 
-        
+
     }
 
     focusNextCellHorizontal(x, y) {
@@ -335,23 +336,33 @@ export class CrosswordGrid extends LitElement {
         this.serverConnection.sendMessage(msg)
     }
 
-    setSolutionLetter(solutionNumber, letter, revealed = false){
+    setSolutionLetter(solutionNumber, letter, revealed = false) {
         this.solutionBox.setLetter(solutionNumber, letter, revealed);
         const x = this.solution_locations[solutionNumber][1];
         const y = this.solution_locations[solutionNumber][0];
         console.log("update solution letter");
+        var old_val = this.grid[y][x].getGridLetter().value;
         this.grid[y][x].getGridLetter().value = letter;
+
+        if (old_val != letter && !revealed) {
+            this.sendMessage({
+                'type': 'update',
+                'x': x,
+                'y': y,
+                'letter': letter
+            });
+        }
 
     }
 
-    
+
 
     render() {
         this.num_hints = 0;
         console.log("refreshing grid");
 
         var solution_length = 0;
-        if (this.solution_locations){
+        if (this.solution_locations) {
             solution_length = this.solution_locations.length;
         }
 

@@ -1,4 +1,4 @@
-const cacheName = 'pwa-conf-v2';
+const cacheName = 'pwa-conf-v3';
 const staticAssets = [
     './app.js ',
     './big_icon.png',
