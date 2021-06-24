@@ -25,6 +25,7 @@ export class WebsocketConnection extends LitElement {
 
     onclose(event){
         console.log("websocket closed");
+        setTimeout(() => this.connect(), 1000);
     }
 
     onerror(event){

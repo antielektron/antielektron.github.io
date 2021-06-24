@@ -8,7 +8,7 @@ function copyToClipboard(text) {
     input.select();
     document.execCommand('copy');
     input.parentNode.removeChild(input);
-    alert("copied url to clipboard");
+    alert("copied url to clipboard, you can share this link to work collaboratively on this puzzle in real time");
 }
 
 export class InfoBox extends LitElement {
@@ -34,7 +34,7 @@ export class InfoBox extends LitElement {
                 top: 0em;
                 left: 0em;
                 right: 0em;
-                height: 6em;
+                min-height: 8em;
 
                 border-style: solid;
                 border-color: white;
@@ -55,7 +55,7 @@ export class InfoBox extends LitElement {
                 border-width: 0.2em;
                 border-style: solid;
                 min-width: 10em;
-                min-height: 2.5em;
+                min-height: 3.5em;
                 box-shadow: none;
                 outline: none;
                 margin: 0.1em 0.1em;
