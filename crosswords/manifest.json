@@ -1,7 +1,7 @@
 {
     "name": "Crosswords",
     "short_name": "crosswords",
-    "start_url": "the-cake-is-a-lie.net/crosswords/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#000000",
     "description": "Simple Collaborative Crossword",
