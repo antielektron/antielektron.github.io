@@ -2,39 +2,46 @@
 <html>
 
 <head>
-    <!-- Polyfills only needed for Firefox and Edge. -->
-    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
-    <!-- Works only on browsers that support Javascript modules like
+  <link rel="icon" type="image/png" href="./favicon.png" />
+  <link rel="manifest" href="./manifest.json">
+  <script type="module" src="./app.js"></script>
+  <script type="module" src="./sw.js"></script>
+
+  <!-- Polyfills only needed for Firefox and Edge. -->
+  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+  <!-- Works only on browsers that support Javascript modules like
        Chrome, Safari, Firefox 60, Edge 17 -->
 
-    <style>
-        body {
-            background-color: black;
-            font-size: 1.5vh;
-        }
+  <style>
+    body {
+      background-color: black;
+      
+      font-size: 1.5vh;
+    }
 
-        @media (max-aspect-ratio: 3/2) {
-            body {
-                font-size: 1.5vh;
-            }
-        }
-    </style>
-    // Original viewport definition, note the "id" that I use to modify the viewport later on:
-    <meta name="viewport" id="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-    
-    <script>
+    @media (max-aspect-ratio: 3/2) {
+      body {
+        font-size: 1.5vh;
+      }
+    }
+  </style>
+  // Original viewport definition, note the "id" that I use to modify the viewport later on:
+  <meta name="viewport" id="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+
+  <script>
     // Global boolean variable that holds the current orientation
     var pageInPortraintMode;
-    
+
     // Listen for window resizes to detect orientation changes
     window.addEventListener("resize", windowSizeChanged);
-    
+
     // Set the global orientation variable as soon as the page loads
-    addEventListener("load", function() {
+    addEventListener("load", function () {
       pageInPortraintMode = window.innerHeight > window.innerWidth;
       document.getElementById("viewport").setAttribute("content", "width=" + window.innerWidth + ", height=" + window.innerHeight + ", initial-scale=1.0, maximum-scale=1.0, user-scalable=0");
     })
-    
+
     // Adjust viewport values only if orientation has changed (not on every window resize)
     function windowSizeChanged() {
       if (((pageInPortraintMode === true) && (window.innerHeight < window.innerWidth)) || ((pageInPortraintMode === false) && (window.innerHeight > window.innerWidth))) {
@@ -42,15 +49,16 @@
         document.getElementById("viewport").setAttribute("content", "width=" + window.innerWidth + ", height=" + window.innerHeight + ", initial-scale=1.0, maximum-scale=1.0, user-scalable=0");
       }
     }
-    </script>
-    
+  </script>
+
 </head>
 
 <body>
-    <info-box id="infobox"></info-box>
-    <server-connection id="server-connection" lang="en" grid_id="grid" url="wss://the-cake-is-a-lie.net:8765"></server-connection>
-    <crossword-grid id="grid" infobox_id="infobox" width="10" height="10"></crossword-grid>
-    <script type="module" src="./main.js"></script>
+  <info-box id="infobox"></info-box>
+  <server-connection id="server-connection" lang="en" grid_id="grid" url="wss://the-cake-is-a-lie.net:8765">
+  </server-connection>
+  <crossword-grid id="grid" infobox_id="infobox" width="10" height="10"></crossword-grid>
+  <script type="module" src="./main.js"></script>
 
 </body>
 

@@ -73,7 +73,7 @@ export class ServerConnection extends WebsocketConnection {
         console.log("stored session", sessionId, "as cookie")
         setCookie("session", sessionId, 2);
         const urlparams = new URLSearchParams(window.location.search);
-        if (urlparams.has('session') && this.sessionId === urlparams.get('session')){
+        if (urlparams.has('session') && this.sessionId === urlparams.get('session')) {
             return;
         }
         urlparams.set('session', sessionId);

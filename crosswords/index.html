@@ -2,6 +2,11 @@
 <html>
 
 <head>
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="manifest" href="./manifest.json">
+    <script type="module" src="./app.js"></script>
+    <script type="module" src="./sw.js"></script>
+
     <!-- Polyfills only needed for Firefox and Edge. -->
     <script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
     <!-- Works only on browsers that support Javascript modules like
@@ -72,8 +77,12 @@
 
     <div class="centerbox">
         <h3>Select the language:</h3>
-        <a href="./german.html"> <div class="box"> German </div> </a>
-        <a href="./english.html"> <div class="box"> English </div> </a>
+        <a href="./german.html">
+            <div class="box"> German </div>
+        </a>
+        <a href="./english.html">
+            <div class="box"> English </div>
+        </a>
     </div>
 
 </body>
