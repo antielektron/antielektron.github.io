@@ -1,4 +1,4 @@
-const cacheName = 'pwa-conf-v3';
+const cacheName = 'pwa-conf-v4';
 const staticAssets = [
     './app.js ',
     './big_icon.png',
@@ -29,7 +29,7 @@ self.addEventListener('install', async event => {
 
 self.addEventListener('fetch', event => {
     const req = event.request;
-    event.respondWith(cacheFirst(req));
+    event.respondWith(networkFirst(req));
 });
 
 async function cacheFirst(req) {
@@ -42,4 +42,10 @@ async function cacheFirst(req) {
     return cachedResponse || fetch(req);
 
 
+}
+
+async function networkFirst(req) {
+    return fetch(req).catch(function() {
+        return caches.match(req);
+    }) 
 }

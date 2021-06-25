@@ -397,6 +397,8 @@ export class GridLetter extends GridBox {
 
     updateLetter(letter, revealed) {
         this.value = letter;
+        var element = this.shadowRoot.getElementById(`${this.x}-${this.y}`);
+        element.value = letter;
         if (revealed) {
             console.log("rec")
             this.shadowRoot.getElementById(`${this.x}-${this.y}`).readOnly = true;

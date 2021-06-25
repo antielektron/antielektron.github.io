@@ -88,7 +88,7 @@ export class CrosswordGrid extends LitElement {
 
         this.solution_locations = json_grid.solution
 
-        if (this.solutionBox){
+        if (this.solutionBox) {
             this.solutionBox.length = this.solution_locations.length;
             this.solutionBox.requestUpdate();
             console.log("update box");
@@ -130,11 +130,16 @@ export class CrosswordGrid extends LitElement {
 
     }
 
-    focusNextCellHorizontal(x, y) {
+    focusNextCellHorizontal(x, y, skip_revealed = false) {
         if (x + 1 < this.width && this.grid[y][x + 1].getGridType() === gridType.LETTER) {
             if (this.grid[y][x].getGridType() === gridType.LETTER) {
-                this.grid[y][x].getGridLetter().blur();
+                //this.grid[y][x].getGridLetter().blur();
             }
+
+            if (skip_revealed && this.grid[y][x + 1].getGridLetter().revealed) {
+                return this.focusNextCellHorizontal(x + 1, y, true);
+            }
+
             this.grid[y][x + 1].getGridLetter().focus(x, y);
 
 
@@ -144,11 +149,16 @@ export class CrosswordGrid extends LitElement {
         return false;
     }
 
-    focusPrevCellHorizontal(x, y) {
+    focusPrevCellHorizontal(x, y, skip_revealed = false) {
         if (x - 1 >= 0 && this.grid[y][x - 1].getGridType() === gridType.LETTER) {
             if (this.grid[y][x].getGridType() === gridType.LETTER) {
-                this.grid[y][x].getGridLetter().blur();
+                //this.grid[y][x].getGridLetter().blur();
             }
+
+            if (skip_revealed && this.grid[y][x - 1].getGridLetter().revealed) {
+                return this.focusPrevCellHorizontal(x - 1, y, true);
+            }
+
             this.grid[y][x - 1].getGridLetter().focus();
 
 
@@ -158,10 +168,13 @@ export class CrosswordGrid extends LitElement {
         return false;
     }
 
-    focusNextCellVertical(x, y) {
+    focusNextCellVertical(x, y, skip_revealed = false) {
         if (y + 1 < this.height && this.grid[y + 1][x].getGridType() === gridType.LETTER) {
             if (this.grid[y][x].getGridType() === gridType.LETTER) {
-                this.grid[y][x].getGridLetter().blur();
+                //this.grid[y][x].getGridLetter().blur();
+            }
+            if (skip_revealed && this.grid[y + 1][x].getGridLetter().revealed) {
+                return this.focusNextCellVertical(x, y + 1, true);
             }
             this.grid[y + 1][x].getGridLetter().focus(x, y);
 
@@ -171,10 +184,13 @@ export class CrosswordGrid extends LitElement {
         return false;
     }
 
-    focusPrevCellVertical(x, y) {
+    focusPrevCellVertical(x, y, skip_revealed = false) {
         if (y - 1 >= 0 && this.grid[y - 1][x].getGridType() === gridType.LETTER) {
             if (this.grid[y][x].getGridType() === gridType.LETTER) {
-                this.grid[y][x].getGridLetter().blur();
+                //this.grid[y][x].getGridLetter().blur();
+            }
+            if (skip_revealed && this.grid[y - 1][x].getGridLetter().revealed) {
+                return this.focusPrevCellVertical(x, y - 1, true);
             }
             this.grid[y - 1][x].getGridLetter().focus();
 
@@ -187,18 +203,18 @@ export class CrosswordGrid extends LitElement {
 
     focusNextCell(x, y) {
         if (this.lastMoveVertical) {
-            if (this.focusNextCellVertical(x, y)) {
+            if (this.focusNextCellVertical(x, y, true)) {
                 return;
             }
-            if (this.focusNextCellHorizontal(x, y)) {
+            if (this.focusNextCellHorizontal(x, y, true)) {
                 this.lastMoveVertical = false;
             }
         }
         else {
-            if (this.focusNextCellHorizontal(x, y)) {
+            if (this.focusNextCellHorizontal(x, y, true)) {
                 return;
             }
-            if (this.focusNextCellVertical(x, y)) {
+            if (this.focusNextCellVertical(x, y, true)) {
                 this.lastMoveVertical = true;
             }
         }
@@ -210,18 +226,18 @@ export class CrosswordGrid extends LitElement {
             return;
         }
         if (this.lastMoveVertical) {
-            if (this.focusPrevCellVertical(x, y)) {
+            if (this.focusPrevCellVertical(x, y, true)) {
                 return;
             }
-            if (this.focusPrevCellHorizontal(x, y)) {
+            if (this.focusPrevCellHorizontal(x, y, true)) {
                 this.lastMoveVertical = false;
             }
         }
         else {
-            if (this.focusPrevCellHorizontal(x, y)) {
+            if (this.focusPrevCellHorizontal(x, y, true)) {
                 return;
             }
-            if (this.focusPrevCellVertical(x, y)) {
+            if (this.focusPrevCellVertical(x, y, true)) {
                 this.lastMoveVertical = true;
             }
         }
