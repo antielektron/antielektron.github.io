@@ -81,7 +81,8 @@ export class InfoBox extends LitElement {
 
     onNew() {
         setCookie("session", "");
-        window.location.href = location.protocol + '//' + location.host + location.pathname;
+        var crosswordRoot = location.pathname.substr(0, location.pathname.lastIndexOf("/")); 
+        window.location.href = location.protocol + '//' + location.host + crosswordRoot;
 
     }
 

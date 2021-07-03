@@ -20,6 +20,7 @@ export class ServerConnection extends WebsocketConnection {
         this.sessionId = null;
         this.isRegistered = false;
         this.crossword_grid = null;
+        this.difficulty = 0;
 
     }
 
@@ -40,6 +41,9 @@ export class ServerConnection extends WebsocketConnection {
             this.sessionId = params.get('session');
             return;
         }
+        if (params.has('difficulty')) {
+            this.difficulty = parseInt(params.get('difficulty'));
+        }
         const cookie_session = getCookie('session');
         if (cookie_session != "") {
             this.sessionId = cookie_session;
@@ -54,6 +58,7 @@ export class ServerConnection extends WebsocketConnection {
         this.sendMessage({
             'type': 'register',
             'sessionId': this.sessionId,
+            'difficulty': this.difficulty,
             'lang': this.lang
         });
     }

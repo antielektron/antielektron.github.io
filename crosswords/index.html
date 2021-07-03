@@ -42,8 +42,8 @@
             box-shadow: none;
             outline: none;
             position: absolute;
-            width: 15em;
-            height: 10em;
+            width: 30em;
+            height: 20em;
             top: 0;
             right: 0;
             bottom: 0;
@@ -54,17 +54,41 @@
             font-size: 1em;
         }
 
+        .bigbox {
+            background-color: black;
+            border-color: white;
+            border-width: 0.2em;
+            border-style: solid;
+            max-width: 30em;
+            max-height: 6em;
+            box-shadow: none;
+            outline: none;
+            position: relative;
+            margin: 1em;
+            padding: 1em;
+            color: white;
+            font-size: 1em;
+        }
+
+        .flex {
+            display: flex;
+            width: 100%;
+        }
+
         .box {
             background-color: black;
             border-color: white;
             border-width: 0.2em;
             border-style: solid;
-            max-width: 15em;
+            flex: auto;
+            width: 33%;
+            text-decoration: none;
+            max-width: 30em;
             max-height: 3em;
             box-shadow: none;
             outline: none;
             position: relative;
-            margin: 1em;
+            margin: 0.5em;
             padding: 1em;
             color: white;
             font-size: 1em;
@@ -76,13 +100,25 @@
 <body>
 
     <div class="centerbox">
-        <h3>Select the language:</h3>
-        <a href="./german.html">
-            <div class="box"> German </div>
-        </a>
-        <a href="./english.html">
-            <div class="box"> English </div>
-        </a>
+        <h3>choose language and difficulty:</h3>
+
+        <div class="bigbox"> <div> German </div>
+            <div class="flex">
+                <a href="./german.html?difficulty=0" class="box"> easy </a>
+                <a href="./german.html?difficulty=1" class="box"> normal </a>
+                <a href="./german.html?difficulty=2" class="box"> hard </a>
+
+            </div>
+        </div>
+
+        <div class="bigbox"> <div> English </div>
+            <div class="flex">
+                <a href="./english.html?difficulty=0" class="box"> easy </a>
+                <a href="./english.html?difficulty=1" class="box"> normal </a>
+                <a href="./english.html?difficulty=2" class="box"> hard </a>
+
+            </div>
+        </div>
     </div>
 
 </body>
