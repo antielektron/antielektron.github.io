@@ -57,6 +57,7 @@ a:visited {
     padding: 2%;
     display: inline-block;
     width: 40vh;
+    height: 40vh;
 }
 
 .patterns-div {
@@ -66,6 +67,7 @@ a:visited {
     padding: 2%;
     display: inline-block;
     width: 40vh;
+    height: 40vh;
 }
 
 .head-label {
