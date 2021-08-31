@@ -17,12 +17,18 @@ export class InfoBox extends LitElement {
             .hinttext {
                 color: white;
                 margin-left: 1em;
-                margin-top: 0.8em;
+                margin-top: 0.5em;
+                
             }
 
             .hintbox {
                 grid-column: 1;
                 grid-row: 1;
+                position: relative;
+                display: block;
+                overflow-y: scroll;
+                height: 8em;
+                
             }
 
             .infobox {

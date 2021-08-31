@@ -448,7 +448,7 @@ export class HintBox extends GridBox {
 
             .triangle-down {
                 position: relative;
-                top: 3em;
+                top: 3.25em;
                 left: 1em;
                 z-index: 10;
                 grid-column: 1;
@@ -464,7 +464,7 @@ export class HintBox extends GridBox {
             .triangle-right {
                 position: relative;
                 top: 1em;
-                left: 3em;
+                left: 3.25em;
                 z-index: 10;
                 grid-column: 1;
                 grid-row: 1;
