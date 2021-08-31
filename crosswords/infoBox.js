@@ -42,7 +42,7 @@ export class InfoBox extends LitElement {
                 right: 0em;
                 min-height: 8em;
 
-                border-style: solid;
+                border-style: none;
                 border-color: white;
                 border-width: 0.2 em;
                 background-color: #333;
@@ -56,10 +56,10 @@ export class InfoBox extends LitElement {
             }
 
             .button {
-                background-color: black;
+                background-color: #222;
                 border-color: white;
                 border-width: 0.2em;
-                border-style: solid;
+                border-style: none;
                 min-width: 10em;
                 min-height: 3.5em;
                 box-shadow: none;
@@ -105,7 +105,7 @@ export class InfoBox extends LitElement {
                 </div>
                 <div class="buttonbox">
                     <button class="button" @click=${this.onNew}> new Crossword </button>
-                    <button class="button" @click=${this.onShare}> share </button>
+                    <button class="button" @click=${this.onShare}> share session</button>
 
                 </div>
             </div>

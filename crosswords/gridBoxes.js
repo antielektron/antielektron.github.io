@@ -479,17 +479,17 @@ export class HintBox extends GridBox {
             input[type='text']{
                 grid-column: 1;
                 grid-row: 1;
-                width: 1.5em;
-                height: 1.5em;
+                width: 2em;
+                height: 2em;
                 text-align: center;
                 border-style: solid;
                 border-color: black;
-                border-width: 0.2 em;
+                border-width: 0.25 em;
                 background-color: #555;
                 outline: none;
                 color: white;
                 text-shadow: 0 0 1 black;
-                font-size: 2em;
+                font-size: 1.5em;
                 user-select: none;
                 text-transform: uppercase;
             }
