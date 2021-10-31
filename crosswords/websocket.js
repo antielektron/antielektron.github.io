@@ -1,4 +1,4 @@
-import { html, css, LitElement } from 'https://unpkg.com/lit-element/lit-element.js?module';
+import { html, css, LitElement } from 'https://unpkg.com/lit-element@2.5.1/lit-element.js?module';
 
 export class WebsocketConnection extends LitElement {
     static get styles() {

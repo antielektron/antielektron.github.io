@@ -1,4 +1,4 @@
-import { html, css, LitElement, unsafeCSS } from 'https://unpkg.com/lit-element/lit-element.js?module';
+import { html, css, LitElement, unsafeCSS } from 'https://unpkg.com/lit-element@2.5.1/lit-element.js?module';
 import { GridLetter } from './gridBoxes.js';
 
 export class SolutionLetter extends LitElement {

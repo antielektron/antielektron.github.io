@@ -1,4 +1,4 @@
-import { html, css, LitElement } from 'https://unpkg.com/lit-element/lit-element.js?module';
+import { html, css, LitElement } from 'https://unpkg.com/lit-element@2.5.1/lit-element.js?module';
 import { WebsocketConnection } from './websocket.js';
 import { getCookie, setCookie } from './cookie.js';
 
