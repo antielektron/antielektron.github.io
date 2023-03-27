@@ -37,7 +37,7 @@ export class InfoBox extends LitElement {
                 position: fixed;
                 display: grid;
                 grid-template-columns: auto min-content;
-                bottom: 0em;
+                top: 0em;
                 left: 0em;
                 right: 0em;
                 min-height: 8em;
