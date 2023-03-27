@@ -52,10 +52,34 @@
 </head>
 
 <body>
-  <info-box id="infobox"></info-box>
+  <div id="toolbar-wrap" style="position: sticky; top: 0px; height: 60px; width: 100%;">
+    <info-box id="infobox"></info-box>
+  </div>
   <server-connection id="server-connection" lang="hp" grid_id="grid" url="wss://the-cake-is-a-lie.net:8765"></server-connection>
   <crossword-grid id="grid" infobox_id="infobox" width="10" height="10"></crossword-grid>
   <script type="module" src="./main.js"></script>
+  <script>
+    let fixPosition = 0; // the fix
+    let lastScrollY = window.pageYOffset; // the last scroll position
+    let toolbarWrap = document.getElementById('toolbar-wrap'); // the toolbar wrap
+    let toolbar = document.getElementById('infobox'); // the toolbar
+
+    // function to run on scroll
+    const showToolbar = function() {
+      // if toolbar wrap is hidden
+      const newPosition = toolbarWrap.getBoundingClientRect().top;
+      if (newPosition < -1) {
+        // add a margin to show the toolbar
+        fixPosition = Math.abs(newPosition); // this is new position we need to fix the toolbar in the display
+        // set the margin to the new fixed position
+        toolbar.style["margin-top"] = fixPosition + "px";
+      }
+    };
+
+    // add an event listener to scroll to check if
+    // toolbar position has moved off the page
+    window.addEventListener("scroll", showToolbar);
+  </script>
 
 </body>
 
