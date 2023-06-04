@@ -1,3 +1,6 @@
 [submodule "pyscript_bootstrap_templates"]
 	path = pyscript_bootstrap_templates
 	url = https://github.com/antielektron/pyscript_bootstrap_templates.git
+[submodule "cell_colony_detector"]
+	path = cell_colony_detector
+	url = https://github.com/antielektron/cell_colony_detector.git
