@@ -1,0 +1,3 @@
+[submodule "pyscript_bootstrap_templates"]
+	path = pyscript_bootstrap_templates
+	url = https://github.com/antielektron/pyscript_bootstrap_templates.git
