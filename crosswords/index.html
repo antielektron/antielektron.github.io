@@ -1,0 +1,481 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="manifest" href="./manifest.json">
+
+    <!-- Polyfills only needed for Firefox and Edge. -->
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+    <!-- Works only on browsers that support Javascript modules like
+       Chrome, Safari, Firefox 60, Edge 17 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./styles.css">
+
+</head>
+
+<body>
+
+<notification-area id="notification-area"></notification-area>
+
+<main id="main-container">
+    <!-- Menu will be shown first -->
+    <crossword-menu id="menu"></crossword-menu>
+    
+    <!-- Grid will be shown after session creation -->
+    <div id="grid-container" style="display: none;">
+        <div class="container">
+            <h2>Crossword Grid</h2>
+            <crossword-grid id="grid" rows="10" cols="10"></crossword-grid>
+        </div>
+    </div>
+</main>
+
+<mobile-keyboard id="keyboard" style="display: none;"></mobile-keyboard>
+
+<script type="module">
+    import './menu.js';
+    import './grid.js';
+    import './keyboard.js';
+    import './notification-area.js';
+    import './clue_area.js';
+    import wsManager from './websocket.js';
+    import notificationManager from './notification-manager.js';
+
+    const menu = document.getElementById('menu');
+    const gridContainer = document.getElementById('grid-container');
+    const keyboard = document.getElementById('keyboard');
+
+    let currentSessionId = null;
+    let clueArea = null;
+    let gridElement = null;
+    let isClosingGame = false; // Flag to prevent popstate from reloading session
+
+    // Test notifications
+    notificationManager.success('App loaded successfully');
+
+    // Helper function to get session ID from URL params
+    function getSessionIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('session_id');
+    }
+
+    // Helper function to update URL with session ID
+    function updateUrlWithSessionId(sessionId) {
+        const params = new URLSearchParams(window.location.search);
+        params.set('session_id', sessionId);
+        window.history.pushState({ sessionId }, '', `${window.location.pathname}?${params.toString()}`);
+    }
+
+    // Helper function to subscribe to a session
+    function subscribeToSession(sessionId) {
+        console.log('Subscribing to session:', sessionId);
+        currentSessionId = sessionId;
+        
+        // Show game UI immediately
+        menu.style.display = 'none';
+        gridContainer.style.display = 'block';
+        keyboard.style.display = 'block';
+        gridContainer.innerHTML = '<div class="loading-spinner">Loading session...</div>';
+        
+        const message = {
+            type: 'subscribe_session',
+            session_id: sessionId
+        };
+        
+        wsManager.send(message);
+        notificationManager.info('Loading session...');
+    }
+
+    // Handle session creation response
+    wsManager.onMessage('session_created', (message) => {
+        console.log('Session created:', message);
+        currentSessionId = message.session_id;
+        
+        // Update URL with session ID
+        updateUrlWithSessionId(message.session_id);
+        
+        // Hide menu, show loading state
+        menu.style.display = 'none';
+        gridContainer.style.display = 'block';
+        keyboard.style.display = 'block';
+        
+        // Show loading indicator
+        gridContainer.innerHTML = '<div class="loading-spinner">Loading game...</div>';
+        notificationManager.info('Session created, loading game...');
+        
+        // Subscribe to session
+        subscribeToSession(message.session_id);
+    });
+
+    // Handle full session state (grid, clues, etc.)
+    wsManager.onMessage('full_session_state', (message) => {
+        console.log('Full session state received:', message);
+        
+        if (message.session_id !== currentSessionId) {
+            console.warn('Received session state for different session, ignoring');
+            return;
+        }
+
+        // Destroy existing clue area if it exists
+        if (clueArea && clueArea.parentNode) {
+            clueArea.remove();
+            clueArea = null;
+        }
+
+        // Create grid from session state
+        const gridRows = message.grid.length;
+        const gridCols = message.grid[0].length;
+        
+        // Create container with close button
+        gridContainer.innerHTML = `
+            <div class="game-header">
+                <h2>Crossword</h2>
+                <div class="header-buttons">
+                    <button class="share-game-btn" aria-label="Share game">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.15c.52.47 1.2.77 1.96.77 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.44 9.31 6.77 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.77 0 1.44-.3 1.96-.77l7.12 4.16c-.057.21-.087.43-.087.66 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                        </svg>
+                    </button>
+                    <button class="close-game-btn" aria-label="Close game">✕</button>
+                </div>
+            </div>
+            <div class="game-content">
+            </div>
+        `;
+        
+        const gameContent = gridContainer.querySelector('.game-content');
+        const closeBtn = gridContainer.querySelector('.close-game-btn');
+        
+        // Create new grid element
+        const gridElementNew = document.createElement('crossword-grid');
+        gridElementNew.id = 'grid';
+        gridElementNew.setAttribute('rows', gridRows);
+        gridElementNew.setAttribute('cols', gridCols);
+        gridElementNew.sessionId = message.session_id; // Set session ID for message sending
+        gridElement = gridElementNew;
+        
+        // Parse walls from grid data (walls are marked with '#')
+        const wallPositions = [];
+        for (let r = 0; r < gridRows; r++) {
+            for (let c = 0; c < gridCols; c++) {
+                if (message.grid[r][c] === '#') {
+                    wallPositions.push([r, c]);
+                }
+            }
+        }
+        
+        // Add grid to game content
+        gameContent.appendChild(gridElement);
+        
+        // Wait for grid to be fully rendered, then set walls and letters
+        setTimeout(() => {
+            gridElement.setWalls(wallPositions);
+            
+            // Set all letters from the server's grid state
+            for (let r = 0; r < gridRows; r++) {
+                for (let c = 0; c < gridCols; c++) {
+                    const cell = message.grid[r][c];
+
+                    // Skip walls and empty cells
+                    if (cell !== '#' && cell !== '') {
+                        gridElement._grid[r][c] = cell;
+                    }
+                }
+            }
+            
+            // Mark solved positions
+            if (message.solved_positions) {
+                for (const [col, row] of message.solved_positions) {
+                    const cellKey = `${row},${col}`;
+                    gridElement._solvedCells.add(cellKey);
+                }
+            }
+            
+            // Populate clue numbers for display
+            gridElement.populateClueNumbers(message.clue_positions_across, message.clue_positions_down);
+            
+            // Populate solution word
+            if (message.solution_word_positions) {
+                gridElement.populateSolutionIndices(message.solution_word_positions);
+            }
+            
+            gridElement.requestUpdate();
+            
+            console.log(`Grid created: ${gridRows}x${gridCols} with ${wallPositions.length} walls`);
+            console.log(`Clues: ${Object.keys(message.clues_across).length} across, ${Object.keys(message.clues_down).length} down`);
+            if (message.solved_positions) {
+                console.log(`Solved positions: ${message.solved_positions.length}`);
+            }
+            if (message.solution_word_positions) {
+                console.log(`Solution word positions: ${message.solution_word_positions.length}`);
+            }
+        }, 0);
+        
+        // Create and add clue area
+        clueArea = document.createElement('clue-area');
+        clueArea.cluesAcross = message.clues_across;
+        clueArea.cluesDown = message.clues_down;
+        clueArea.cluePositionsAcross = message.clue_positions_across;
+        clueArea.cluePositionsDown = message.clue_positions_down;
+        clueArea.grid = message.grid; // Pass grid for dimension calculation
+        
+        // Setup gridData for solved clue tracking
+        const walls = new Set();
+        for (let r = 0; r < gridRows; r++) {
+            for (let c = 0; c < gridCols; c++) {
+                if (message.grid[r][c] === '#') {
+                    walls.add(`${r},${c}`);
+                }
+            }
+        }
+        const solvedCells = new Set();
+        if (message.solved_positions) {
+            for (const [col, row] of message.solved_positions) {
+                solvedCells.add(`${row},${col}`);
+            }
+        }
+        clueArea.gridData = { 
+            rows: gridRows, 
+            cols: gridCols, 
+            walls: walls,
+            solvedCells: solvedCells
+        };
+        
+        clueArea.selectedRow = 0;
+        clueArea.selectedCol = 0;
+        clueArea.selectedMode = 'horizontal';
+        
+        // Update solved clues initially
+        clueArea._updateSolvedClues();
+        
+        document.body.insertBefore(clueArea, document.body.firstChild);
+        
+        // Listen for cell selection changes
+        gridElement.addEventListener('cell-selected', (e) => {
+            clueArea.selectedRow = e.detail.row;
+            clueArea.selectedCol = e.detail.col;
+            clueArea.selectedMode = e.detail.mode;
+            clueArea.requestUpdate();
+        });
+        
+        // Listen for clue clicks to navigate grid
+        clueArea.addEventListener('clue-selected', (e) => {
+            const { row, col, mode } = e.detail;
+            // Call _onCellClick with preferred mode from the clue
+            gridElement._onCellClick(row, col, mode);
+            gridElement.focus();
+        });
+        
+        // Listen for letter updates to update solved clues
+        gridElement.addEventListener('letter-changed', (e) => {
+            const { row, col, is_solved } = e.detail;
+            const cellKey = `${row},${col}`;
+            if (is_solved) {
+                clueArea.gridData.solvedCells.add(cellKey);
+            } else {
+                clueArea.gridData.solvedCells.delete(cellKey);
+            }
+            clueArea._updateSolvedClues();
+            clueArea.requestUpdate();
+        });
+        
+        // Close button handler
+        closeBtn.addEventListener('click', closeGame);
+        
+        const shareBtn = gridContainer.querySelector('.share-game-btn');
+        shareBtn.addEventListener('click', shareGame);
+        
+        notificationManager.success('Game loaded successfully');
+    });
+
+    // Function to share game
+    function shareGame() {
+        console.log('Sharing game with session ID:', currentSessionId);
+        
+        // Build URL with session ID
+        const url = `${window.location.origin}${window.location.pathname}?session_id=${currentSessionId}`;
+        
+        // Try native share API first (mobile)
+        if (navigator.share) {
+            navigator.share({
+                title: 'Join my Crossword!',
+                text: 'Play crossword with me!',
+                url: url
+            }).then(() => {
+                console.log('Share successful');
+            }).catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error('Error sharing:', err);
+                    showShareDialog(url);
+                }
+            });
+        } else {
+            // Fallback: show dialog with link
+            showShareDialog(url);
+        }
+    }
+
+    // Function to show share dialog with copy option
+    function showShareDialog(url) {
+        console.log('Showing share dialog with URL:', url);
+        
+        // Create modal dialog
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        `;
+        
+        const content = document.createElement('div');
+        content.style.cssText = `
+            background: #2a2520;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        `;
+        
+        content.innerHTML = `
+            <h3 style="margin: 0 0 1rem 0; color: #f5f1ed; font-size: 1.2rem;">Share Game Link</h3>
+            <p style="margin: 0 0 1rem 0; color: #d4cdc5; font-size: 0.9rem;">Copy this link and send it to friends:</p>
+            <input type="text" value="${url}" readonly style="
+                width: 100%;
+                padding: 0.75rem;
+                background: #1a1511;
+                color: #f5f1ed;
+                border: 1px solid #5a4a4a;
+                border-radius: 0.25rem;
+                font-family: monospace;
+                font-size: 0.85rem;
+                box-sizing: border-box;
+                margin-bottom: 1rem;
+            " id="share-url-input" />
+            <div style="display: flex; gap: 0.5rem;">
+                <button id="copy-btn" style="
+                    flex: 1;
+                    padding: 0.75rem;
+                    background: #4a7a9e;
+                    color: #f5f1ed;
+                    border: none;
+                    border-radius: 0.25rem;
+                    cursor: pointer;
+                    font-weight: 600;
+                ">Copy</button>
+                <button id="close-share-btn" style="
+                    flex: 1;
+                    padding: 0.75rem;
+                    background: #5a4a4a;
+                    color: #f5f1ed;
+                    border: none;
+                    border-radius: 0.25rem;
+                    cursor: pointer;
+                    font-weight: 600;
+                ">Close</button>
+            </div>
+        `;
+        
+        dialog.appendChild(content);
+        document.body.appendChild(dialog);
+        
+        // Copy button
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const input = document.getElementById('share-url-input');
+            input.select();
+            document.execCommand('copy');
+            notificationManager.success('Link copied!');
+            dialog.remove();
+        });
+        
+        // Close button
+        document.getElementById('close-share-btn').addEventListener('click', () => {
+            dialog.remove();
+        });
+        
+        // Close on background click
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    }
+
+    // Function to close game and return to menu
+    function closeGame() {
+        console.log('Closing game');
+        
+        // Simply reload the page without session ID to return to menu
+        window.location.href = window.location.pathname;
+    }
+
+    // Handle errors
+    wsManager.onMessage('error', (message) => {
+        console.error('Server error:', message);
+        
+        // Show menu again
+        menu.style.display = 'block';
+        gridContainer.style.display = 'none';
+        keyboard.style.display = 'none';
+        gridContainer.innerHTML = '';
+        
+        notificationManager.error(message.error_message || 'An error occurred');
+    });
+
+    // Check on page load if we have an existing session ID
+    window.addEventListener('load', () => {
+        const existingSessionId = getSessionIdFromUrl();
+        
+        if (existingSessionId) {
+            console.log('Found existing session ID in URL:', existingSessionId);
+            
+            // Wait for WebSocket to connect before subscribing
+            if (wsManager.isConnected()) {
+                subscribeToSession(existingSessionId);
+            } else {
+                // Register handler to subscribe once connected
+                wsManager.onMessage('open', () => {
+                    subscribeToSession(existingSessionId);
+                });
+            }
+            
+            // Hide menu immediately
+            menu.style.display = 'none';
+            gridContainer.style.display = 'block';
+            keyboard.style.display = 'block';
+            gridContainer.innerHTML = '<div class="loading-spinner">Reconnecting to session...</div>';
+        }
+    });
+
+    // Handle back button to switch between sessions
+    window.addEventListener('popstate', (event) => {
+        // Skip if we just closed the game intentionally
+        if (isClosingGame) {
+            console.log('Game is being closed, skipping popstate');
+            return;
+        }
+        
+        console.log('Popstate event:', event);
+        const sessionId = getSessionIdFromUrl();
+        
+        if (sessionId && currentSessionId !== sessionId) {
+            console.log('Navigating to session:', sessionId);
+            subscribeToSession(sessionId);
+        } else if (!sessionId) {
+            console.log('No session in URL, showing menu');
+            closeGame();
+        }
+    });
+</script>
+</body>
+</html>
