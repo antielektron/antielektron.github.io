@@ -67,9 +67,12 @@ export class CrosswordMenu extends LitElement {
         const portStr = port ? `:${port}` : '';
         
         // If host is localhost, use it as is. Otherwise, add crosswords_backend/ to the path
-        const path = isLocalhost ? '' : 'the-cake-is-a-lie.net/crosswords_backend/';
-        
-        return `${protocol}://${host}${portStr}/${path}`;
+        const path = isLocalhost ? '' : 'wss://the-cake-is-a-lie.net/crosswords_backend/';
+
+        if (isLocalhost) {
+            return `${protocol}://${host}${portStr}/${path}`;
+        };
+        return 'wss://the-cake-is-a-lie.net/crosswords_backend/';
     }
 
     _requestSessionProperties() {
