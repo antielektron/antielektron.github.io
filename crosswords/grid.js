@@ -81,18 +81,45 @@ export class CrosswordGrid extends LitElement {
 		this._ensureGrid();
 		// set CSS variables for cell-size and column count; layout done in external stylesheet
 		return html`
-			<div class="grid-container ${this._isSolutionWordComplete() ? 'complete' : ''}">
-				<div class="grid" style="--cell-size: ${this._cellSize}px; --cols: ${this.cols};">
-					${this._grid.map((row, r) => row.map((cell, c) => this._renderCell(r, c, cell))).flat()}
+			<div class="main-grid-scroll-container">
+				<div class="grid-container ${this._isSolutionWordComplete() ? 'complete' : ''}">
+					<div class="grid" style="--cell-size: ${this._cellSize}px; --cols: ${this.cols};">
+						${this._grid.map((row, r) => row.map((cell, c) => this._renderCell(r, c, cell))).flat()}
+					</div>
 				</div>
 			</div>
 			${this._solutionWordPositions.length > 0 ? html`
-				<h3 style="margin-top: 2rem;">Solution Word</h3>
-				<div class="grid solution-word-grid" style="--cell-size: 40px; --cols: ${this._solutionWordPositions.length};">
-					${this._solutionWordPositions.map((pos, i) => this._renderSolutionCell(i, pos))}
+				<div class="solution-scroll-container">
+					<h2 style="text-align: center;">Solution Word</h2>
+					<div class="grid solution-word-grid" style="--cell-size: 40px; --cols: ${this._solutionWordPositions.length};">
+						${this._solutionWordPositions.map((pos, i) => this._renderSolutionCell(i, pos))}
+					</div>
 				</div>
 			` : ''}
 		`;
+	}
+
+	updated(changedProperties) {
+		super.updated(changedProperties);
+		// Set pulse animation delays when grid becomes complete
+		if (this._isSolutionWordComplete()) {
+			this._setPulseDelays();
+		}
+	}
+
+	_setPulseDelays() {
+		const gridContainer = this.querySelector('.grid-container');
+		if (gridContainer && gridContainer.classList.contains('complete')) {
+			const cells = gridContainer.querySelectorAll('.cell');
+			cells.forEach((cell, index) => {
+				// Calculate row and column from index
+				const row = Math.floor(index / this.cols);
+				const col = index % this.cols;
+				// Diagonal wave: delay based on row + col (top-left to bottom-right)
+				const diagonalIndex = row + col;
+				cell.style.setProperty('--pulse-delay', `${diagonalIndex * 0.1}s`);
+			});
+		}
 	}
 	
 	_renderSolutionCell(index, position) {

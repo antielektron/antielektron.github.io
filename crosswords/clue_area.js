@@ -388,7 +388,7 @@ export class ClueArea extends LitElement {
                 <div class="clue-header">
                     ${currentClue ? html`
                         <div class="current-clue">
-                            <span class="clue-number">${currentClue.number}. ${currentClue.direction}</span>
+                            <span class="clue-number">${currentClue.direction === 'across' ? '▶' : '▼'} ${currentClue.number}</span>
                         </div>
                         <div class="clue-text">${currentClue.text}</div>
                     ` : html`
@@ -396,7 +396,7 @@ export class ClueArea extends LitElement {
                     `}
                     
                     <div class="clue-toggle-group">
-                        <div class="clue-text empty">Show all clues:</div>
+                        <div class="clue-text empty">Clues:</div>
 
                         <button class="clue-toggle" @click="${this._toggleShowAllCluesAcross}" title="Show all across clues">
                             <span class="chevron">▶</span>

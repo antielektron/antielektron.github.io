@@ -88,6 +88,9 @@
         notificationManager.info('Loading session...');
     }
 
+    // Make subscribeToSession available globally for the menu component
+    window.subscribeToSession = subscribeToSession;
+
     // Handle session creation response
     wsManager.onMessage('session_created', (message) => {
         console.log('Session created:', message);
@@ -131,9 +134,10 @@
         // Create container with close button
         gridContainer.innerHTML = `
             <div class="game-header">
-                <h2>Crossword</h2>
+                <h2 style="text-align: center;">Crossword</h2>
                 <div class="header-buttons">
                     <button class="share-game-btn" aria-label="Share game">
+                        <span style="padding-right: 0.5rem;">Share Session</span>
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                             <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.15c.52.47 1.2.77 1.96.77 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.44 9.31 6.77 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.77 0 1.44-.3 1.96-.77l7.12 4.16c-.057.21-.087.43-.087.66 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
                         </svg>

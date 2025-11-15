@@ -1,7 +1,24 @@
 :root {
-    --keyboard-space: 30vh; /* reserve ~30% of viewport height for keyboard on small screens */
-    --page-padding: clamp(0.75rem, 3.5vw, 2rem);
+    --keyboard-space: 30vh; /* fallback - will be calculated dynamically */
+    --page-padding: 0rem;
     --max-container-width: 720px;
+    
+    /* Calculated keyboard height - all values proportional to key-width for consistency */
+    --key-width: clamp(1.7rem, 5.5vw, 2.1rem);
+    --key-height: calc(var(--key-width) * 1.4);
+    --keyboard-gap: calc(var(--key-width) * 0.2);        /* gap between rows, proportional to key size */
+    --keyboard-padding: calc(var(--key-width) * 0.4);    /* keyboard padding, proportional to key size */
+    --handle-height: calc(var(--key-width) * 0.8);       /* handle height, proportional to key size */
+    --handle-padding: calc(var(--key-width) * 0.2);      /* handle padding, proportional to key size */
+    --keyboard-border: 2px;                              /* fixed border */
+    --keyboard-buffer: calc(var(--key-width) * 0.3);     /* bottom buffer, proportional to key size */
+    
+    --keyboard-height: calc(
+        (var(--key-height) * 4) +            /* 4 rows of keys */
+        (var(--keyboard-gap) * 3) +          /* 3 gaps between rows */
+        (var(--keyboard-padding) * 2) +      /* keyboard padding top/bottom */
+        var(--keyboard-border) +             /* keyboard border-top */
+    );
     
     /* Crossword color palette - lighter, more paper-like */
     --paper-bg: #f9f7f3;
@@ -42,15 +59,14 @@ main {
     justify-content: center; 
     align-items: flex-start; 
     padding: var(--page-padding); 
-    padding-bottom: 0;  /* Remove keyboard space by default (desktop) */
-    min-height: calc(100vh - 0px); 
+    min-height: 100vh; 
     box-sizing: border-box; 
 }
 
-/* Add keyboard space on mobile devices */
+/* On mobile devices, expand main to fill more space when keyboard is collapsed */
 @media (max-width: 900px) {
     main {
-        padding-bottom: var(--keyboard-space);
+        min-height: calc(100vh - var(--keyboard-space));
     }
 }
 .container { 
@@ -82,7 +98,9 @@ crossword-grid { display: block; margin: 0 auto; }
     display: inline-block;
     gap: 0;
     overflow: visible;
-    padding: 20px;
+    /* padding only top and bottom for better centering */
+    padding-bottom: 1rem;
+    padding-top: 1rem;
 }
 
 .grid {
@@ -94,10 +112,7 @@ crossword-grid { display: block; margin: 0 auto; }
     border: none;
 }
 
-.grid-container.complete .grid {
-    animation: grid-glow 2s ease-in-out infinite;
-    will-change: box-shadow;
-}
+/* Grid glow animation removed - now using solution letter glow */
 
 .cell {
     width: var(--cell-size, 4rem); 
@@ -249,6 +264,13 @@ crossword-grid { display: block; margin: 0 auto; }
     display: block;
 }
 
+.solution-word-grid {
+    max-width: 100%;
+    width: fit-content; /* Only take the space needed */
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
 .grid .cell .solution-circle {
     display: block;
 }
@@ -293,15 +315,6 @@ crossword-grid { display: block; margin: 0 auto; }
     }
 }
 
-@keyframes grid-glow {
-    0%, 100% {
-        box-shadow: 0 0 20px rgba(100, 200, 100, 0.3), inset 0 0 20px rgba(100, 200, 100, 0.1);
-    }
-    50% {
-        box-shadow: 0 0 40px rgba(100, 200, 100, 0.6), inset 0 0 40px rgba(100, 200, 100, 0.2);
-    }
-}
-
 .cell.solved {
     background: 
         repeating-linear-gradient(87deg, transparent, transparent 3px, rgba(100,200,100,.1) 3px, rgba(100,200,100,.1) 5px),
@@ -340,25 +353,9 @@ crossword-grid { display: block; margin: 0 auto; }
     }
 }
 
-.solution-word-grid.complete .cell {
-    animation: cell-bounce 0.8s ease-in-out;
-}
 
-.solution-word-grid.complete .cell:nth-child(1) { animation-delay: 0s; }
-.solution-word-grid.complete .cell:nth-child(2) { animation-delay: 0.1s; }
-.solution-word-grid.complete .cell:nth-child(3) { animation-delay: 0.2s; }
-.solution-word-grid.complete .cell:nth-child(4) { animation-delay: 0.3s; }
-.solution-word-grid.complete .cell:nth-child(5) { animation-delay: 0.4s; }
-.solution-word-grid.complete .cell:nth-child(6) { animation-delay: 0.5s; }
-.solution-word-grid.complete .cell:nth-child(7) { animation-delay: 0.6s; }
-.solution-word-grid.complete .cell:nth-child(8) { animation-delay: 0.7s; }
-.solution-word-grid.complete .cell:nth-child(9) { animation-delay: 0.8s; }
-.solution-word-grid.complete .cell:nth-child(10) { animation-delay: 0.9s; }
-.solution-word-grid.complete .cell:nth-child(11) { animation-delay: 1.0s; }
-.solution-word-grid.complete .cell:nth-child(12) { animation-delay: 1.1s; }
-.solution-word-grid.complete .cell:nth-child(13) { animation-delay: 1.2s; }
-.solution-word-grid.complete .cell:nth-child(14) { animation-delay: 1.3s; }
-.solution-word-grid.complete .cell:nth-child(15) { animation-delay: 1.4s; }
+
+
 
 .cell.selected { 
     outline: none; 
@@ -448,8 +445,8 @@ mobile-keyboard[collapsed] .keyboard-wrapper {
 mobile-keyboard .keyboard {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    padding: 0.75em;
+    gap: var(--keyboard-gap);
+    padding: var(--keyboard-padding);
     background: 
         repeating-linear-gradient(87deg, transparent, transparent 3px, rgba(255,255,255,.02) 3px, rgba(255,255,255,.02) 5px),
         repeating-linear-gradient(22deg, transparent, transparent 4px, rgba(255,255,255,.015) 4px, rgba(255,255,255,.015) 6px),
@@ -657,8 +654,8 @@ mobile-keyboard .key-spacer {
 
 mobile-keyboard .handle {
     position: absolute;
-    top: -1.6rem;
-    left: 0.75rem;
+    top: calc(-1 * var(--handle-height));
+    left: var(--keyboard-padding);
     transform: none;
     background: 
         repeating-linear-gradient(87deg, transparent, transparent 3px, rgba(255,255,255,.01) 3px, rgba(255,255,255,.01) 5px),
@@ -670,7 +667,7 @@ mobile-keyboard .handle {
         repeating-radial-gradient(circle at 34% 51%, rgba(255,255,255,.008) 1.5px, transparent 1.5px),
         linear-gradient(135deg, #1a1512 0%, #0f0c09 100%);
     color: #7a7268;
-    padding: 0.35rem 0.6rem;
+    padding: var(--handle-padding) calc(var(--handle-padding) * 1.5);
     border-radius: 0.25rem 0.25rem 0 0;
     border: 1px solid rgba(58, 53, 48, 0.4);
     cursor: pointer;
@@ -696,6 +693,19 @@ mobile-keyboard:not([collapsed]) .keyboard-container { transform: translateY(0);
 
 @media (max-width: 980px) and (orientation: portrait) {
     mobile-keyboard .keyboard { padding-bottom: 1.6rem; }
+    
+    /* Override :root variables globally for portrait mode */
+    :root {
+        --keyboard-height: calc(
+            (calc(8vw * 1.4) * 4) +          /* 4 rows with 8vw-based key-height */
+            (calc(8vw * 0.2) * 3) +          /* 3 gaps between rows (8vw-based) */
+            calc(8vw * 0.4) +                /* bottom padding (8vw-based) - the 1.6rem is separate */
+            calc(8vw * 0.8) +                /* handle height (8vw-based) */
+            2px +                            /* keyboard border-top */
+            0.6rem                           /* visual buffer for shadow effects */
+        );
+    }
+    
     mobile-keyboard {
         width: 100%;
         --key-width: 8vw;
@@ -837,6 +847,108 @@ crossword-menu {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+}
+
+/* Session management styles */
+.saved-sessions {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.saved-sessions h3 {
+    margin: 0 0 1rem 0;
+    color: #5c6fc3;
+    font-size: 1.1rem;
+}
+
+.session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.session-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.session-id {
+    font-family: monospace;
+    font-weight: bold;
+    color: #222c55;
+}
+
+.session-time, .session-lang {
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.session-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.reconnect-btn {
+    padding: 0.4rem 0.8rem;
+    background: rgba(76, 175, 80, 0.2);
+    color: #81c784;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.reconnect-btn:hover {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+.remove-btn {
+    padding: 0.4rem 0.6rem;
+    background: rgba(244, 67, 54, 0.2);
+    color: #ef5350;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+    background: rgba(244, 67, 54, 0.3);
+    border-color: rgba(244, 67, 54, 0.5);
+}
+
+.clear-all-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 152, 0, 0.2);
+    color: #ffab40;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.clear-all-btn:hover {
+    background: rgba(255, 152, 0, 0.3);
+    border-color: rgba(255, 152, 0, 0.5);
 }
 
 .loading {
@@ -1005,20 +1117,29 @@ crossword-menu {
 /* Game Header with Close Button */
 .game-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding: 0 0.5rem;
+    margin-bottom: 0.2rem;
+    padding: 0.5rem 0.5rem;
+    position: relative;
 }
 
 .game-header h2 {
     margin: 0;
-    flex-grow: 1;
+}
+
+/* On very small screens, align title to the left */
+@media (max-width: 600px) {
+    .game-header {
+        justify-content: flex-start;
+    }
 }
 
 .header-buttons {
     display: flex;
     gap: 0.5rem;
+    position: absolute;
+    right: 0.5rem;
 }
 
 .share-game-btn {
@@ -1038,7 +1159,7 @@ crossword-menu {
     border: 1px solid rgba(100, 180, 255, 0.3);
     color: #f5f1ed;
     cursor: pointer;
-    width: 2.5rem;
+    /* width: 2.5rem; */
     height: 2.5rem;
     display: flex;
     align-items: center;
@@ -1047,6 +1168,7 @@ crossword-menu {
     transition: all 0.2s ease;
     flex-shrink: 0;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+    font-size: 1.1rem;
 }
 
 .share-game-btn:hover {
@@ -1123,18 +1245,40 @@ crossword-menu {
 .game-content {
     display: block;
     overflow-y: auto;
-    overflow-x: auto;
+    overflow-x: auto; /* Allow horizontal scrolling */
     max-height: calc(100vh - 200px); /* Leave space for header, clue area, and keyboard */
     width: 100%;
-    padding: 1rem 0;  /* Add some padding for breathing room */
     text-align: center;  /* Center inline-block children */
 }
 
 crossword-grid {
-    display: inline-block;
-    min-width: fit-content;  /* Ensure grid takes its full needed width */
+    display: block;
+    width: 100%;
     border-radius: 0px;
     position: relative;
+}
+
+/* Completely independent scroll containers */
+.main-grid-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.main-grid-scroll-container .grid-container {
+    display: inline-block;
+    min-width: fit-content;
+    align-items: center;
+}
+
+.solution-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    display: inline-block; /* Behave like inline-block to only take needed space */
+    width: auto; /* Auto width to fit content */
 }
 
 /* Clue Area */
@@ -1159,13 +1303,14 @@ crossword-grid {
     z-index: 1000;
     padding: 1rem;
     box-sizing: border-box;
-    max-height: 20vh;
-    overflow-y: auto;
+    max-height: 3.5rem;
+    transition: max-height 0.3s ease;
+    overflow-y: hidden;
 }
 
 /* Expanded clue area - show all clues */
 .clue-area.expanded {
-    max-height: 50vh;
+    max-height: 100vh;
 }
 
 .clue-header {
@@ -1179,6 +1324,7 @@ crossword-grid {
     font-weight: 600;
     color: #a8b8ff;
     font-size: 0.875rem;
+    min-width: 2rem;
 }
 
 .clue-number {
@@ -1190,8 +1336,12 @@ crossword-grid {
 .clue-text {
     color: #f5f1ed;
     font-size: 0.95rem;
-    line-height: 1.4;
+    line-height: 1.7;
     flex-grow: 1;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: scroll;
+    padding-bottom: 0.5rem;
 }
 
 .clue-text.empty {
@@ -1217,8 +1367,8 @@ crossword-grid {
     color: #f5f1ed;
     font-size: 1rem;
     cursor: pointer;
-    width: 2rem;
-    height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1256,6 +1406,7 @@ crossword-grid {
     display: flex;
     gap: 0.5rem;
     flex-shrink: 0;
+
 }
 
 /* All Clues View */
@@ -1324,6 +1475,50 @@ crossword-grid {
 
 /* Adjust main content for clue area */
 main {
-    padding-top: calc(var(--page-padding) + 6rem);
+    padding-top: calc(var(--page-padding) + 4rem);
+}
+
+/* Solution circle rotation animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Solution circles spin continuously when complete */
+@keyframes spin-with-translate {
+    from {
+        transform: translate(calc(-50% + var(--cell-size) * 0.0625), calc(-50% + var(--cell-size) * 0.0625)) rotate(0deg);
+    }
+    to {
+        transform: translate(calc(-50% + var(--cell-size) * 0.0625), calc(-50% + var(--cell-size) * 0.0625)) rotate(360deg);
+    }
+}
+
+.solution-word-grid.complete .solution-circle,
+.grid-container.complete .solution-circle {
+    animation: spin-with-translate 3s linear infinite;
+}
+
+/* Pulse animation for all grid cells when puzzle is solved */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5);
+    }
+}
+
+.grid-container.complete .cell {
+    animation: pulse 0.6s ease-in-out;
+}
+
+/* Staggered animation delays using CSS custom property */
+.grid-container.complete .cell {
+    animation-delay: var(--pulse-delay, 0s);
 }
 

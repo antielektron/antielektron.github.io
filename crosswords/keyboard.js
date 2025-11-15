@@ -132,24 +132,47 @@ export class MobileKeyboard extends LitElement {
 			window.removeEventListener('resize', this._onResize);
 		}
 
-		_onResize() {
-			const mobile = window.innerWidth <= 900;
-			this._isMobile = mobile;
-			this.classList.toggle('mobile', mobile);
-			this.classList.toggle('desktop', !mobile);
-			// decide wide-screen (landscape/tablet) to change layout behavior
-			const wide = (window.innerWidth / window.innerHeight) > 1.6;
-			this._wideScreen = wide;
-			this.classList.toggle('wide-screen', wide);
-			// collapsed default: expanded on mobile, collapsed on desktop
-			if (mobile) this.collapsed = false;
-			else this.collapsed = true;
+	_onResize() {
+		const mobile = window.innerWidth <= 900;
+		this._isMobile = mobile;
+		this.classList.toggle('mobile', mobile);
+		this.classList.toggle('desktop', !mobile);
+		// decide wide-screen (landscape/tablet) to change layout behavior
+		const wide = (window.innerWidth / window.innerHeight) > 1.6;
+		this._wideScreen = wide;
+		this.classList.toggle('wide-screen', wide);
+		
+		// collapsed default: expanded on mobile, collapsed on desktop
+		const wasCollapsed = this.collapsed;
+		if (mobile) this.collapsed = false;
+		else this.collapsed = true;
+		
+		// Set padding immediately when state changes
+		const main = document.querySelector('main');
+		if (main) {
+			if (this.collapsed) {
+				main.style.paddingBottom = 'var(--page-padding)';
+			} else {
+				const computedHeight = getComputedStyle(this).getPropertyValue('--keyboard-height').trim();
+				main.style.paddingBottom = computedHeight;
+			}
 		}
-
-		_toggleCollapse() {
+	}		_toggleCollapse() {
 			this.collapsed = !this.collapsed;
-			if (this.collapsed) this.setAttribute('collapsed', '');
-			else this.removeAttribute('collapsed');
+			if (this.collapsed) {
+				this.setAttribute('collapsed', '');
+				// Remove padding when keyboard is collapsed
+				const main = document.querySelector('main');
+				if (main) main.style.paddingBottom = 'var(--page-padding)';
+			} else {
+				this.removeAttribute('collapsed');
+				// Add padding when keyboard is expanded - get actual computed height
+				const main = document.querySelector('main');
+				if (main) {
+					const computedHeight = getComputedStyle(this).getPropertyValue('--keyboard-height').trim();
+					main.style.paddingBottom = computedHeight;
+				}
+			}
 		}
 }
 

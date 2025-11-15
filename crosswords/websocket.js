@@ -111,16 +111,16 @@ class WebSocketManager {
      * Internal handler - called on socket close
      */
     _onClose(event) {
-        console.log('WebSocket closed');
+        console.log('WebSocket closed - reloading page');
         if (this.notificationManager) {
-            this.notificationManager.info('Connection lost, reconnecting...', 0); // No auto-dismiss
+            this.notificationManager.info('Connection lost, reloading...', 2000);
         }
         this._callHandlers('close', { type: 'close' });
         
-        if (!this.isReconnecting) {
-            this.isReconnecting = true;
-            setTimeout(() => this.connect(this.url), this.reconnectDelay);
-        }
+        // Simply reload the page instead of trying to reconnect
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
     }
 
     /**
