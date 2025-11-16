@@ -73,6 +73,9 @@
         console.log('Subscribing to session:', sessionId);
         currentSessionId = sessionId;
         
+        // Update URL with session ID
+        updateUrlWithSessionId(sessionId);
+        
         // Show game UI immediately
         menu.style.display = 'none';
         gridContainer.style.display = 'block';
@@ -134,7 +137,7 @@
         // Create container with close button
         gridContainer.innerHTML = `
             <div class="game-header">
-                <h2 style="text-align: center;">Crossword</h2>
+                <h2 id="crossword-title" style="text-align: center;">Crossword (0%)</h2>
                 <div class="header-buttons">
                     <button class="share-game-btn" aria-label="Share game">
                         <span style="padding-right: 0.5rem;">Share Session</span>
@@ -284,6 +287,36 @@
             clueArea._updateSolvedClues();
             clueArea.requestUpdate();
         });
+
+        // Listen for completion ratio updates
+        gridElement.addEventListener('completion-ratio-changed', (e) => {
+            const { completionRatio } = e.detail;
+            updateHeaderTitle(completionRatio);
+            
+            // Update session storage with completion ratio
+            if (window.updateSessionCompletionRatio) {
+                window.updateSessionCompletionRatio(currentSessionId, completionRatio);
+            }
+        });
+        
+        // Function to update header title with completion percentage
+        function updateHeaderTitle(completionRatio) {
+            const titleElement = document.getElementById('crossword-title');
+            if (titleElement) {
+                titleElement.textContent = `Crossword (${completionRatio}%)`;
+            }
+        }
+        
+        // Calculate initial completion ratio after grid is fully set up
+        setTimeout(() => {
+            const initialRatio = gridElement.getCompletionRatio();
+            updateHeaderTitle(initialRatio);
+            
+            // Update session storage with initial completion ratio
+            if (window.updateSessionCompletionRatio) {
+                window.updateSessionCompletionRatio(currentSessionId, initialRatio);
+            }
+        }, 100);
         
         // Close button handler
         closeBtn.addEventListener('click', closeGame);

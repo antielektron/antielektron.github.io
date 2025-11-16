@@ -553,6 +553,36 @@ export class CrosswordGrid extends LitElement {
 	}
 
 	/**
+	 * Calculate completion ratio as percentage (0-100)
+	 */
+	_calculateCompletionRatio() {
+		let totalNonWallCells = 0;
+		let solvedCells = 0;
+		
+		for (let r = 0; r < this.rows; r++) {
+			for (let c = 0; c < this.cols; c++) {
+				if (this._grid[r][c] !== '#') {
+					totalNonWallCells++;
+					const cellKey = `${r},${c}`;
+					if (this._solvedCells.has(cellKey)) {
+						solvedCells++;
+					}
+				}
+			}
+		}
+		
+		if (totalNonWallCells === 0) return 0;
+		return Math.round((solvedCells / totalNonWallCells) * 100);
+	}
+
+	/**
+	 * Get current completion ratio (public method)
+	 */
+	getCompletionRatio() {
+		return this._calculateCompletionRatio();
+	}
+
+	/**
 	 * Handle letter updates from server (broadcast messages from other players)
 	 */
 	_onLetterUpdateFromServer(message) {
@@ -588,6 +618,14 @@ export class CrosswordGrid extends LitElement {
 			}
 			
 			this.requestUpdate();
+			
+			// Calculate and emit completion ratio update
+			const completionRatio = this._calculateCompletionRatio();
+			this.dispatchEvent(new CustomEvent('completion-ratio-changed', {
+				detail: { completionRatio },
+				bubbles: true,
+				composed: true
+			}));
 			
 			// Trigger animation if solution word just completed
 			if (this._isSolutionWordComplete()) {

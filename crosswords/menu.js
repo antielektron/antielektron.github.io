@@ -37,9 +37,14 @@ export class CrosswordMenu extends LitElement {
         wsManager.setNotificationManager(notificationManager);
         // Listen for session creation/subscription events
         wsManager.onMessage('session_created', (msg) => this._onSessionCreated(msg));
-        wsManager.onMessage('session_subscribed', (msg) => this._onSessionSubscribed(msg));
-        wsManager.onMessage('session_not_found', (msg) => this._onSessionNotFound(msg));
+        wsManager.onMessage('full_session_state', (msg) => this._onSessionJoined(msg));
+        wsManager.onMessage('error', (msg) => this._onSessionError(msg));
         this._initializeConnection();
+        
+        // Make update function available globally
+        window.updateSessionCompletionRatio = (sessionId, completionRatio) => {
+            this._updateSessionCompletionRatio(sessionId, completionRatio);
+        };
     }
 
     disconnectedCallback() {
@@ -48,8 +53,8 @@ export class CrosswordMenu extends LitElement {
         wsManager.offMessage('available_session_properties', this._handleSessionProperties);
         wsManager.offMessage('error', this._handleError);
         wsManager.offMessage('session_created', this._onSessionCreated);
-        wsManager.offMessage('session_subscribed', this._onSessionSubscribed);
-        wsManager.offMessage('session_not_found', this._onSessionNotFound);
+        wsManager.offMessage('full_session_state', this._onSessionJoined);
+        wsManager.offMessage('error', this._onSessionError);
     }
 
     _initializeConnection() {
@@ -116,7 +121,7 @@ export class CrosswordMenu extends LitElement {
         
         this._loading = false;
         this._error = null;
-        notificationManager.success('Game options loaded');
+        notificationManager.success('Connected to Crossword server');
         this.requestUpdate();
     }
 
@@ -165,14 +170,26 @@ export class CrosswordMenu extends LitElement {
 
     // Session storage management
     _initializeSessionStorage() {
-        const savedSessionsData = this._getCookie('savedSessions');
-        if (savedSessionsData) {
-            try {
-                this._savedSessions = JSON.parse(savedSessionsData);
-                this._saveSessionsEnabled = true;
-            } catch (e) {
-                console.warn('Failed to parse saved sessions cookie:', e);
-                this._clearAllCookies();
+        // Check if the save setting is enabled
+        const saveSettingEnabled = this._getCookie('saveSessionsEnabled');
+        if (saveSettingEnabled === 'true') {
+            this._saveSessionsEnabled = true;
+            
+            // Load saved sessions if the setting is enabled
+            const savedSessionsData = this._getCookie('savedSessions');
+            if (savedSessionsData) {
+                try {
+                    this._savedSessions = JSON.parse(savedSessionsData);
+                    
+                    // Ensure all sessions have a completionRatio field (for backward compatibility)
+                    this._savedSessions = this._savedSessions.map(session => ({
+                        ...session,
+                        completionRatio: session.completionRatio || 0
+                    }));
+                } catch (e) {
+                    console.warn('Failed to parse saved sessions cookie:', e);
+                    this._clearAllCookies();
+                }
             }
         }
     }
@@ -196,14 +213,25 @@ export class CrosswordMenu extends LitElement {
 
     _clearAllCookies() {
         this._deleteCookie('savedSessions');
+        this._deleteCookie('saveSessionsEnabled');
         this._savedSessions = [];
         this._saveSessionsEnabled = false;
         this.requestUpdate();
     }
 
+    _clearSessionsOnly() {
+        this._deleteCookie('savedSessions');
+        this._savedSessions = [];
+        this.requestUpdate();
+    }
+
     _toggleSessionSaving() {
         this._saveSessionsEnabled = !this._saveSessionsEnabled;
-        if (!this._saveSessionsEnabled) {
+        if (this._saveSessionsEnabled) {
+            // Save the setting preference when enabled
+            this._setCookie('saveSessionsEnabled', 'true');
+        } else {
+            // Clear everything when disabled
             this._clearAllCookies();
         }
         this.requestUpdate();
@@ -219,6 +247,7 @@ export class CrosswordMenu extends LitElement {
         this._savedSessions.unshift({
             id: sessionId,
             timestamp: Date.now(),
+            completionRatio: 0, // Default completion ratio
             ...sessionInfo
         });
         
@@ -230,10 +259,25 @@ export class CrosswordMenu extends LitElement {
         this.requestUpdate();
     }
 
+    _updateSessionCompletionRatio(sessionId, completionRatio) {
+        if (!this._saveSessionsEnabled) return;
+        
+        // Find and update the session
+        const sessionIndex = this._savedSessions.findIndex(s => s.id === sessionId);
+        if (sessionIndex !== -1) {
+            this._savedSessions[sessionIndex].completionRatio = completionRatio;
+            this._savedSessions[sessionIndex].timestamp = Date.now(); // Update timestamp
+            
+            // Save updated sessions to cookie
+            this._setCookie('savedSessions', JSON.stringify(this._savedSessions));
+            this.requestUpdate();
+        }
+    }
+
     _removeSession(sessionId) {
         this._savedSessions = this._savedSessions.filter(s => s.id !== sessionId);
         if (this._savedSessions.length === 0) {
-            this._clearAllCookies();
+            this._clearSessionsOnly();
         } else {
             this._setCookie('savedSessions', JSON.stringify(this._savedSessions));
         }
@@ -250,7 +294,7 @@ export class CrosswordMenu extends LitElement {
         }
     }
 
-    _onSessionSubscribed(message) {
+    _onSessionJoined(message) {
         if (message.session_id) {
             this._saveSession(message.session_id, {
                 type: 'joined'
@@ -258,10 +302,17 @@ export class CrosswordMenu extends LitElement {
         }
     }
 
-    _onSessionNotFound(message) {
-        if (message.session_id) {
-            this._removeSession(message.session_id);
-            notificationManager.warning(`Session ${message.session_id.substring(0, 8)}... no longer exists and was removed from saved sessions`);
+    _onSessionError(message) {
+        // Check if it's a session not found error
+        if (message.error_message && message.error_message.includes('session') && message.error_message.includes('not found')) {
+            // Try to extract session ID from error message or use current session ID
+            // This is a fallback - we might not always have the exact session ID in error messages
+            const sessionIdMatch = message.error_message.match(/session\s+([a-f0-9-]+)/i);
+            if (sessionIdMatch) {
+                const sessionId = sessionIdMatch[1];
+                this._removeSession(sessionId);
+                notificationManager.warning(`Session ${sessionId.substring(0, 8)}... no longer exists and was removed from saved sessions`);
+            }
         }
     }
 
@@ -284,7 +335,7 @@ export class CrosswordMenu extends LitElement {
     }
 
     _clearSavedSessions() {
-        this._clearAllCookies();
+        this._clearSessionsOnly();
         notificationManager.info('All saved sessions cleared');
     }
 
@@ -366,6 +417,7 @@ export class CrosswordMenu extends LitElement {
                                             <span class="session-id">${session.id.substring(0, 8)}...</span>
                                             <span class="session-time">${this._formatTimestamp(session.timestamp)}</span>
                                             ${session.language ? html`<span class="session-lang">${session.language.toUpperCase()}</span>` : ''}
+                                            <span class="session-completion">${session.completionRatio || 0}% solved</span>
                                         </div>
                                         <div class="session-actions">
                                             <button class="reconnect-btn" @click="${() => this._reconnectToSession(session.id)}">Rejoin</button>
